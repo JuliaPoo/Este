@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <PIN_ROOT>.\extLibs\pin-3.18-98332-gaebd7b1e6-msvc-windows</PIN_ROOT>
+    <WIN_INCLUDE>C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0</WIN_INCLUDE>
+    <TOMLC99>.\extLibs\tomlc99</TOMLC99>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="PIN_ROOT">
+      <Value>$(PIN_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="WIN_INCLUDE">
+      <Value>$(WIN_INCLUDE)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TOMLC99">
+      <Value>$(TOMLC99)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
