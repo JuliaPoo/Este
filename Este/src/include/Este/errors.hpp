@@ -8,8 +8,6 @@ constexpr const char* __get_filename_from_fullpath(const char* fullpath) {
 };
 #define __FILENAME__ __get_filename_from_fullpath(__FILE__)
 
-// TODO: Log to a file instead of printf
-//#define __CONDITIONAL_FPRINTF(...) (Log::logfile_handle ? fprintf(Log::logfile_handle, __VA_ARGS__) : printf(__VA_ARGS__))
 #define __CONDITIONAL_FPRINTF(format, ...) \
 if (Log::__logfile_handle) {fprintf(Log::__logfile_handle, format, __VA_ARGS__); fflush(Log::__logfile_handle); } \
 else {printf(format, __VA_ARGS__);}

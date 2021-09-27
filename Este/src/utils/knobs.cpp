@@ -11,7 +11,7 @@ static bool is_init = false;
 
 KNOB<std::string> knobs_config_file(KNOB_MODE_WRITEONCE, "pintool",
     "config-file", "este-config.toml",
-    "Config file for Yoki."
+    "Config file for Este."
 );
 
 #define OUTPUT_DIR_DOCUMENTATION                                             \
