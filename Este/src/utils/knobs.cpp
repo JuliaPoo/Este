@@ -55,7 +55,7 @@ void _init_logging()
     output_prefix = fileprefix.str();
 
     // Initialise logging
-    // TODO
+    Log::Init(output_prefix + ".log");
 }
 
 void _parse_analysis_scope_table(toml_table_t* conf)
