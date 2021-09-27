@@ -1,0 +1,14 @@
+# Brief description of config file
+title = "Este Dynamic Analysis Config"
+
+[OUTPUT]
+
+# output-dir @type str:
+#    Directory where Yoki will dump logs and the taintdatabase to.
+output-dir = "Este-out"
+
+[ANALYSIS-SCOPE]
+
+# binary-whitelist @type List[str]:
+#    Este will analyse only binaries in this list
+binary-whitelist = ["a-32.exe", "msvcrt.dll"]

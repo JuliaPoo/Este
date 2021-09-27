@@ -19,7 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="extLibs\tomlc99\toml.c" />
     <ClCompile Include="src\Este.cpp" />
+    <ClCompile Include="src\utils\knobs.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\include\Este\errors.hpp" />
+    <ClInclude Include="src\include\Este\knobs.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -79,23 +85,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)build\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)build\$(Configuration)\$(Platform)\intermediate</IntDir>
+    <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)build\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)build\$(Configuration)\$(Platform)\intermediate</IntDir>
+    <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)build\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)build\$(Configuration)\$(Platform)\intermediate</IntDir>
+    <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IntDir>$(SolutionDir)build\$(Configuration)\$(Platform)\intermediate</IntDir>
-    <OutDir>$(SolutionDir)build\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate</IntDir>
+    <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -103,7 +109,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__PIN__=1;PIN_CRT=1;TARGET_WINDOWS;_STLP_IMPORT_IOSTREAMS;TARGET_IA32;HOST_IA32;_SECURE_SCL=0;_WINDOWS_H_PATH_=um;__i386__</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(WIN_INCLUDE);$(TOMLC99);$(PIN_ROOT)\source\include\pin;$(PIN_ROOT)\source\include\pin\gen;$(PIN_ROOT)\source\tools\InstLib;$(PIN_ROOT)\extras\xed-ia32\include\xed;$(PIN_ROOT)\extras\components\include;$(PIN_ROOT)\extras\stlport\include;$(PIN_ROOT)\extras;$(PIN_ROOT)\extras\libstdc++\include;$(PIN_ROOT)\extras\crt\include;$(PIN_ROOT)\extras\crt;$(PIN_ROOT)\extras\crt\include\arch-x86;$(PIN_ROOT)\extras\crt\include\kernel\uapi;$(PIN_ROOT)\extras\crt\include\kernel\uapi\asm-x86;$(SolutionDir)\Este\src\includes;$(VC_IncludePath);$(WindowsSDK_IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WIN_INCLUDE);$(TOMLC99);$(PIN_ROOT)\source\include\pin;$(PIN_ROOT)\source\include\pin\gen;$(PIN_ROOT)\source\tools\InstLib;$(SolutionDir)src\include;$(PIN_ROOT)\extras\xed-ia32\include\xed;$(PIN_ROOT)\extras\components\include;$(PIN_ROOT)\extras\stlport\include;$(PIN_ROOT)\extras;$(PIN_ROOT)\extras\libstdc++\include;$(PIN_ROOT)\extras\crt\include;$(PIN_ROOT)\extras\crt;$(PIN_ROOT)\extras\crt\include\arch-x86;$(PIN_ROOT)\extras\crt\include\kernel\uapi;$(PIN_ROOT)\extras\crt\include\kernel\uapi\asm-x86;$(SolutionDir)\Este\src\includes;$(VC_IncludePath);$(WindowsSDK_IncludePath)</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <DisableSpecificWarnings>5208</DisableSpecificWarnings>
       <AdditionalOptions>/GR- /GS- /EHs- /EHa- /Oi- /X /FIinclude/msvc_compat.h %(AdditionalOptions)</AdditionalOptions>
@@ -125,7 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__PIN__=1;PIN_CRT=1;TARGET_WINDOWS;_STLP_IMPORT_IOSTREAMS;TARGET_IA32;HOST_IA32;_SECURE_SCL=0;_WINDOWS_H_PATH_=um;__i386__</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(WIN_INCLUDE);$(TOMLC99);$(PIN_ROOT)\source\include\pin;$(PIN_ROOT)\source\include\pin\gen;$(PIN_ROOT)\source\tools\InstLib;$(PIN_ROOT)\extras\xed-ia32\include\xed;$(PIN_ROOT)\extras\components\include;$(PIN_ROOT)\extras\stlport\include;$(PIN_ROOT)\extras;$(PIN_ROOT)\extras\libstdc++\include;$(PIN_ROOT)\extras\crt\include;$(PIN_ROOT)\extras\crt;$(PIN_ROOT)\extras\crt\include\arch-x86;$(PIN_ROOT)\extras\crt\include\kernel\uapi;$(PIN_ROOT)\extras\crt\include\kernel\uapi\asm-x86;$(SolutionDir)\Este\src\includes;$(VC_IncludePath);$(WindowsSDK_IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WIN_INCLUDE);$(TOMLC99);$(PIN_ROOT)\source\include\pin;$(PIN_ROOT)\source\include\pin\gen;$(PIN_ROOT)\source\tools\InstLib;$(SolutionDir)src\include;$(PIN_ROOT)\extras\xed-ia32\include\xed;$(PIN_ROOT)\extras\components\include;$(PIN_ROOT)\extras\stlport\include;$(PIN_ROOT)\extras;$(PIN_ROOT)\extras\libstdc++\include;$(PIN_ROOT)\extras\crt\include;$(PIN_ROOT)\extras\crt;$(PIN_ROOT)\extras\crt\include\arch-x86;$(PIN_ROOT)\extras\crt\include\kernel\uapi;$(PIN_ROOT)\extras\crt\include\kernel\uapi\asm-x86;$(SolutionDir)\Este\src\includes;$(VC_IncludePath);$(WindowsSDK_IncludePath)</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <DisableSpecificWarnings>5208</DisableSpecificWarnings>
       <AdditionalOptions>/GR- /GS- /EHs- /EHa- /Oi- /X /FIinclude/msvc_compat.h %(AdditionalOptions)</AdditionalOptions>
@@ -147,7 +153,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__PIN__=1;PIN_CRT=1;TARGET_WINDOWS;_STLP_IMPORT_IOSTREAMS;TARGET_IA32E;__LP64__;HOST_IA32E;_SECURE_SCL=0;_WINDOWS_H_PATH_=um</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(WIN_INCLUDE);$(TOMLC99);$(PIN_ROOT)\source\include\pin;$(PIN_ROOT)\source\include\pin\gen;$(PIN_ROOT)\source\tools\InstLib;$(PIN_ROOT)\extras\xed-intel64\include\xed;$(PIN_ROOT)\extras\components\include;$(PIN_ROOT)\extras\stlport\include;$(PIN_ROOT)\extras;$(PIN_ROOT)\extras\libstdc++\include;$(PIN_ROOT)\extras\crt\include;$(PIN_ROOT)\extras\crt;$(PIN_ROOT)\extras\crt\include\arch-x86;$(PIN_ROOT)\extras\crt\include\kernel\uapi;$(PIN_ROOT)\extras\crt\include\kernel\uapi\asm-x86;$(SolutionDir)\Este\src\includes;$(VC_IncludePath);$(WindowsSDK_IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WIN_INCLUDE);$(TOMLC99);$(PIN_ROOT)\source\include\pin;$(PIN_ROOT)\source\include\pin\gen;$(PIN_ROOT)\source\tools\InstLib;$(SolutionDir)src\include;$(PIN_ROOT)\extras\xed-intel64\include\xed;$(PIN_ROOT)\extras\components\include;$(PIN_ROOT)\extras\stlport\include;$(PIN_ROOT)\extras;$(PIN_ROOT)\extras\libstdc++\include;$(PIN_ROOT)\extras\crt\include;$(PIN_ROOT)\extras\crt;$(PIN_ROOT)\extras\crt\include\arch-x86;$(PIN_ROOT)\extras\crt\include\kernel\uapi;$(PIN_ROOT)\extras\crt\include\kernel\uapi\asm-x86;$(SolutionDir)\Este\src\includes;$(VC_IncludePath);$(WindowsSDK_IncludePath)</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <DisableSpecificWarnings>5208</DisableSpecificWarnings>
       <AdditionalOptions>/GR- /GS- /EHs- /EHa- /Oi- /X /FIinclude/msvc_compat.h %(AdditionalOptions)</AdditionalOptions>
@@ -169,7 +175,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__PIN__=1;PIN_CRT=1;TARGET_WINDOWS;_STLP_IMPORT_IOSTREAMS;TARGET_IA32E;__LP64__;HOST_IA32E;_SECURE_SCL=0;_WINDOWS_H_PATH_=um</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(WIN_INCLUDE);$(TOMLC99);$(PIN_ROOT)\source\include\pin;$(PIN_ROOT)\source\include\pin\gen;$(PIN_ROOT)\source\tools\InstLib;$(PIN_ROOT)\extras\xed-intel64\include\xed;$(PIN_ROOT)\extras\components\include;$(PIN_ROOT)\extras\stlport\include;$(PIN_ROOT)\extras;$(PIN_ROOT)\extras\libstdc++\include;$(PIN_ROOT)\extras\crt\include;$(PIN_ROOT)\extras\crt;$(PIN_ROOT)\extras\crt\include\arch-x86;$(PIN_ROOT)\extras\crt\include\kernel\uapi;$(PIN_ROOT)\extras\crt\include\kernel\uapi\asm-x86;$(SolutionDir)\Este\src\includes;$(VC_IncludePath);$(WindowsSDK_IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WIN_INCLUDE);$(TOMLC99);$(PIN_ROOT)\source\include\pin;$(PIN_ROOT)\source\include\pin\gen;$(PIN_ROOT)\source\tools\InstLib;$(SolutionDir)src\include;$(PIN_ROOT)\extras\xed-intel64\include\xed;$(PIN_ROOT)\extras\components\include;$(PIN_ROOT)\extras\stlport\include;$(PIN_ROOT)\extras;$(PIN_ROOT)\extras\libstdc++\include;$(PIN_ROOT)\extras\crt\include;$(PIN_ROOT)\extras\crt;$(PIN_ROOT)\extras\crt\include\arch-x86;$(PIN_ROOT)\extras\crt\include\kernel\uapi;$(PIN_ROOT)\extras\crt\include\kernel\uapi\asm-x86;$(SolutionDir)\Este\src\includes;$(VC_IncludePath);$(WindowsSDK_IncludePath)</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <DisableSpecificWarnings>5208</DisableSpecificWarnings>
       <AdditionalOptions>/GR- /GS- /EHs- /EHa- /Oi- /X /FIinclude/msvc_compat.h %(AdditionalOptions)</AdditionalOptions>
