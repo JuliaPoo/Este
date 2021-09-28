@@ -10,9 +10,10 @@ namespace Serial {
 		std::string db_filepath
 	);
 
-
 	// Returns serializer to .este.json file
 	// Contains generic information about process
 	std::ofstream& getDb();
 
+	// Correctly serializes only for ascii characters
+	std::string escape(std::string const s);
 }

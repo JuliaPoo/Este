@@ -27,7 +27,7 @@ void Proc::addImage(Ctx::Image img)
 	this->_images_lock.writer_release(w);
 
 	w = this->_serial_db_lock.writer_aquire();
-	Serial::getDb() << img << ",";
+	Serial::getDb() << (this->images.size() == 1 ? "" : ",") << img;
 	this->_serial_db_lock.writer_release(w);
 }
 

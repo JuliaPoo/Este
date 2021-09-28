@@ -1,5 +1,6 @@
 #include "Este\image.hpp"
 #include "Este\errors.hpp"
+#include "Este\serial.hpp"
 
 #include <sstream>
 
@@ -43,13 +44,18 @@ std::string Image::toStr()
 std::ostream& Ctx::operator<<(std::ostream& out, const Image& i)
 {
 	out << "{" // Opening
-		<< "\"path\":" << "\"" << i.path << "\","
+		<< "\"path\":" << Serial::escape(i.path) << ","
 		<< "\"addr_range\":[" << i.addr_range.first << "," << i.addr_range.second << "],"
 		<< "\"addr_range_executable\":[";
-	for (auto r : i.addr_range_executable)
-		out << "[" << r.first << "," << r.second << "],";
+
+	uint8_t is_first = 1;
+	for (auto r : i.addr_range_executable) {
+		out << (is_first-- ? "[" : ",[");
+		out << r.first << "," << r.second << "]";
+	}
+
 	out << "],"
-		<< "\"is_main\":" << (i.is_main ? "true" : "false") << ","
+		<< "\"is_main\":" << (i.is_main ? "true" : "false")
 		<< "}"; // Closing
 
 	return out;
