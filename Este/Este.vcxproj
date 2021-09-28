@@ -20,12 +20,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="extLibs\tomlc99\toml.c" />
+    <ClCompile Include="src\ctx\image.cpp" />
+    <ClCompile Include="src\ctx\proc.cpp" />
     <ClCompile Include="src\Este.cpp" />
+    <ClCompile Include="src\instruments\instruments.cpp" />
+    <ClCompile Include="src\utils\errors.cpp" />
     <ClCompile Include="src\utils\knobs.cpp" />
+    <ClCompile Include="src\utils\serial.cpp" />
+    <ClCompile Include="src\utils\sync.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\include\Este\errors.hpp" />
+    <ClInclude Include="src\include\Este\image.hpp" />
+    <ClInclude Include="src\include\Este\instruments.hpp" />
     <ClInclude Include="src\include\Este\knobs.hpp" />
+    <ClInclude Include="src\include\Este\proc.hpp" />
+    <ClInclude Include="src\include\Este\serial.hpp" />
+    <ClInclude Include="src\include\Este\sync.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -86,21 +97,21 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate</IntDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate</IntDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate</IntDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate</IntDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate\</IntDir>
     <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

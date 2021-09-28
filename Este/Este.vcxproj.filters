@@ -19,6 +19,12 @@
     <Filter Include="Source Files\extLibs">
       <UniqueIdentifier>{251e176f-10c3-4553-a1a1-9b6b698b9d9b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\instruments">
+      <UniqueIdentifier>{beea2a7e-22e7-44e2-a434-bc18a2ca0199}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ctx">
+      <UniqueIdentifier>{a0724913-5644-4d1d-8b3d-38c08a104596}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Este.cpp">
@@ -30,12 +36,45 @@
     <ClCompile Include="extLibs\tomlc99\toml.c">
       <Filter>Source Files\extLibs</Filter>
     </ClCompile>
+    <ClCompile Include="src\instruments\instruments.cpp">
+      <Filter>Source Files\instruments</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ctx\image.cpp">
+      <Filter>Source Files\ctx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ctx\proc.cpp">
+      <Filter>Source Files\ctx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\errors.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\sync.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\serial.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\include\Este\knobs.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\include\Este\errors.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\Este\instruments.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\Este\image.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\Este\serial.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\Este\proc.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\Este\sync.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

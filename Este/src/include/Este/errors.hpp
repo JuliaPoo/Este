@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <string>
 
 #define __PATH_SEPERATOR__ '\\'
 constexpr const char* __get_filename_from_fullpath(const char* fullpath) {
@@ -17,8 +18,8 @@ else {printf(format, __VA_ARGS__);}
 
 namespace Log
 {
-	extern FILE* __logfile_handle = NULL;
+	extern FILE* __logfile_handle;
 
 	// Initialise logging with log filename
-	void Init(std::string logfile) { __logfile_handle = fopen(logfile.c_str(), "w");}
+	void Init(std::string logfile);
 }
