@@ -11,3 +11,8 @@ cd Este\Este\extLibs
 ```
 
 Open `Este\Este.sln` in VS 2019, select build configuration to `Release` and build (in x64 or Win32).
+
+## Usage
+
+[TODO]
+For now just go into the `.\test` folder and run `run.bat 0 a-32.exe` or smth. The output is in `Este-out`. Read `run.bat` and `este-config.toml` for more information.
