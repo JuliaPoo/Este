@@ -16,4 +16,7 @@ namespace Knobs {
 
 	// returns output files path prefix: <output-dir>/pid<pid>
 	std::string getOutputPrefix();
+
+	// checks if path is whitelisted
+	bool isBinaryWhitelisted(std::string path);
 }

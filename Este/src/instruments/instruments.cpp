@@ -23,8 +23,23 @@ VOID Fini(INT32 code, Ctx::Proc* procCtx)
 VOID ImageLoad(IMG img, Ctx::Proc* procCtx)
 {
 	Ctx::Image i(img);
-    procCtx->addImage(img);
+    procCtx->addImage(i);
 	LOGGING("Image loaded! %s", i.toStr().c_str());
+}
+
+VOID Trace(TRACE trace, Ctx::Proc* procCtx)
+{
+    auto taddr = TRACE_Address(trace);
+
+    // Check if trace is within whitelisted binaries
+    auto img = procCtx->getImageExecutable(taddr);
+    if (img == NULL || img->isWhitelisted())
+        return;
+
+    // TODO: Log the bb
+    for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {
+        // BBL_InsertCall();
+    }
 }
 
 void Instrument::Init_callbacks()
@@ -38,4 +53,7 @@ void Instrument::Init_callbacks()
     // Process finish instrumentation
     PIN_AddPrepareForFiniFunction((PREPARE_FOR_FINI_CALLBACK)PrepareForFiniFunctionFini, procCtx);
     PIN_AddFiniFunction((FINI_CALLBACK)Fini, procCtx);
+
+    // Basic Blocks
+    TRACE_AddInstrumentFunction((TRACE_INSTRUMENT_CALLBACK)Trace, procCtx);
 }

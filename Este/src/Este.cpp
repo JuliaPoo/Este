@@ -17,7 +17,8 @@ int main(int argc, char* argv[])
 
     // Initialise serial
     Serial::Init_serializers(
-        Knobs::getOutputPrefix() + ".este.json" // generic db
+        Knobs::getOutputPrefix() + ".este.json", // generic db
+        Knobs::getOutputPrefix() + ".bb.csv" // basic blocks
     );
 
     // Initialise PIN

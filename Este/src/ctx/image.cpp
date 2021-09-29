@@ -1,6 +1,8 @@
 #include "Este\image.hpp"
 #include "Este\errors.hpp"
 #include "Este\serial.hpp"
+#include "Este\knobs.hpp"
+#include "Este\utils.hpp"
 
 #include <sstream>
 
@@ -24,6 +26,7 @@ Image::Image(IMG img)
 	}
 
 	this->is_main = IMG_IsMainExecutable(img);
+	this->is_whitelisted = Knobs::isBinaryWhitelisted(this->path);
 }
 
 std::string Image::toStr()
@@ -31,6 +34,7 @@ std::string Image::toStr()
 	std::stringstream ret;
 	ret << __get_filename_from_fullpath(this->path.c_str()) // Filename
 		<< (this->is_main ? " [MAIN]" : "") // is_main
+		<< (this->is_whitelisted ? " [WHITELISTED]" : "") // is_main
 		<< " [" << STREAM_POINTER_FORMAT << this->addr_range.first << "-" 
 		<< STREAM_POINTER_FORMAT << this->addr_range.second << "]" // addr range
 		<< " [ Executable: ";
@@ -44,19 +48,59 @@ std::string Image::toStr()
 std::ostream& Ctx::operator<<(std::ostream& out, const Image& i)
 {
 	out << "{" // Opening
-		<< "\"path\":" << Serial::escape(i.path) << ","
+		<< "\"path\":" << EsteUtils::json_escape(i.path) << ","
 		<< "\"addr_range\":[" << i.addr_range.first << "," << i.addr_range.second << "],"
 		<< "\"addr_range_executable\":[";
 
-	uint8_t is_first = 1;
+	uint8_t is_first = 0;
 	for (auto r : i.addr_range_executable) {
-		out << (is_first-- ? "[" : ",[");
+		out << (is_first++==0 ? "[" : ",[");
 		out << r.first << "," << r.second << "]";
 	}
 
 	out << "],"
-		<< "\"is_main\":" << (i.is_main ? "true" : "false")
+		<< "\"is_main\":" << (i.is_main ? "true" : "false") << ","
+		<< "\"is_whitelisted\":" << (i.is_whitelisted ? "true" : "false")
 		<< "}"; // Closing
 
 	return out;
+}
+
+const std::string& Image::getPath() const 
+{ 
+	return this->path; 
+}
+
+const std::pair<ADDRINT, ADDRINT>& Image::getAddrRange() const 
+{ 
+	return this->addr_range; 
+}
+
+const std::vector< std::pair<ADDRINT, ADDRINT>>& Image::getAddrRangeExecutable() const 
+{ 
+	return this->addr_range_executable; 
+}
+
+bool Image::isMain() const 
+{ 
+	return this->is_main; 
+}
+
+bool Image::isWhitelisted() const 
+{
+	return this->is_whitelisted; 
+}
+
+bool Image::isWithinBinary(ADDRINT addr) const
+{
+	auto& r = this->addr_range;
+	return addr < r.second&& addr > r.first;
+}
+
+bool Image::isWithinExecutableRange(ADDRINT addr) const 
+{
+	for (auto& r : this->addr_range_executable)
+		if (addr < r.second && addr > r.first)
+			return true;
+	return false;
 }

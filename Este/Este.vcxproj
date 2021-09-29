@@ -28,6 +28,7 @@
     <ClCompile Include="src\utils\knobs.cpp" />
     <ClCompile Include="src\utils\serial.cpp" />
     <ClCompile Include="src\utils\sync.cpp" />
+    <ClCompile Include="src\utils\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\include\Este\errors.hpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="src\include\Este\proc.hpp" />
     <ClInclude Include="src\include\Este\serial.hpp" />
     <ClInclude Include="src\include\Este\sync.hpp" />
+    <ClInclude Include="src\include\Este\utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

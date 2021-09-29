@@ -17,7 +17,15 @@ namespace Ctx {
 		// std::ostream& operator<<(std::ostream& out) const;
 
 		// Adds image to this->images and serializes it into serial::db (.este.json)
-		void addImage(Ctx::Image img);
+		void addImage(Ctx::Image& img);
+
+		// Get image whereby addr is situated in. Returns NULL if not found.
+		const Image* getImage(ADDRINT addr) const;
+
+		// Get image whereby addr is situated in
+		// with additional condition of being executable. 
+		// Returns NULL if not found.
+		const Image* getImageExecutable(ADDRINT addr) const;
 
 	private:
 

@@ -4,7 +4,7 @@ title = "Este Dynamic Analysis Config"
 [OUTPUT]
 
 # output-dir @type str:
-#    Directory where Yoki will dump logs and the taintdatabase to.
+#    Directory where Este will dump logs and the taintdatabase to.
 output-dir = "Este-out"
 
 [ANALYSIS-SCOPE]

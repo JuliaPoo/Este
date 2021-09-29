@@ -1,5 +1,6 @@
 #include "Este\knobs.hpp"
 #include "Este\errors.hpp"
+#include "Este\utils.hpp"
 
 #include <iostream>
 #include <toml.h>
@@ -140,4 +141,17 @@ std::string Knobs::getOutputPrefix()
     if (!is_init)
         RAISE_EXCEPTION("Knobs not initialised before calling `getOutputPrefix`! Call Knobs::Init()");
     return output_prefix;
+}
+
+bool Knobs::isBinaryWhitelisted(std::string path)
+{
+    if (!is_init)
+        RAISE_EXCEPTION("Knobs not initialised before calling `isBinaryWhitelisted`! Call Knobs::Init()");
+
+    path = EsteUtils::toLower(path);
+    for (auto p : whitelist_binaries)
+        if (EsteUtils::hasSuffix(path, EsteUtils::toLower(p)))
+            return true;
+
+    return false;
 }

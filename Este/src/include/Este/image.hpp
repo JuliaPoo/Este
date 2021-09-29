@@ -24,11 +24,19 @@ namespace Ctx
 		// To string method for logging
 		std::string toStr();
 
-		const auto& getPath() const { return this->path; }
+		const std::string& getPath() const;
 
-		const auto& getAddrRange() const { return this->addr_range; }
+		const std::pair<ADDRINT, ADDRINT>& getAddrRange() const;
 
-		const auto& getAddrRangeExecutable() const { return this->addr_range_executable; }
+		const std::vector< std::pair<ADDRINT, ADDRINT>>& getAddrRangeExecutable() const;
+
+		bool isMain() const;
+
+		bool isWhitelisted() const;
+
+		bool isWithinBinary(ADDRINT addr) const;
+
+		bool isWithinExecutableRange(ADDRINT addr) const;
 
 	private:
 
@@ -43,6 +51,9 @@ namespace Ctx
 
 		// Is main executable
 		bool is_main = false;
+
+		// Is whitelisted
+		bool is_whitelisted = false;
 
 	};
 
