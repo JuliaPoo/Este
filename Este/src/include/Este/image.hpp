@@ -5,6 +5,10 @@
 
 #include <pin.H>
 
+namespace Ctx { // Forward declaration
+	class Proc;
+}
+
 namespace Ctx
 {
 	// Image object represents a loaded binary
@@ -16,13 +20,15 @@ namespace Ctx
 		Image() {};
 
 		// Initialise itself from PIN
-		Image(IMG img);
+		Image(const IMG img, const Proc* proc);
 
 		// Serializer friend declaration
 		friend std::ostream& operator<<(std::ostream& out, const Image& i);
 
 		// To string method for logging
 		std::string toStr();
+
+		const int32_t getIdx() const;
 
 		const std::string& getPath() const;
 
@@ -38,7 +44,14 @@ namespace Ctx
 
 		bool isWithinExecutableRange(ADDRINT addr) const;
 
+		int32_t getExecutableSectionIdx(ADDRINT addr) const;
+
 	private:
+
+		/* To be serialized */
+
+		// Image idx
+		int32_t idx = -1;
 
 		// File path of binary
 		std::string path;

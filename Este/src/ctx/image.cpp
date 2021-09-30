@@ -3,6 +3,7 @@
 #include "Este\serial.hpp"
 #include "Este\knobs.hpp"
 #include "Este\utils.hpp"
+#include "Este\proc.hpp"
 
 #include <sstream>
 
@@ -10,8 +11,9 @@ using namespace Ctx;
 
 #define STREAM_POINTER_FORMAT std::hex << std::setw(2*sizeof(void*)) << std::setfill('0')
 
-Image::Image(IMG img)
+Image::Image(const IMG img, const Proc* proc)
 {
+	this->idx = proc->getNumImages();
 	this->path = IMG_Name(img);
 	this->addr_range = std::make_pair(IMG_LowAddress(img), IMG_HighAddress(img));
 
@@ -33,6 +35,7 @@ std::string Image::toStr()
 {
 	std::stringstream ret;
 	ret << __get_filename_from_fullpath(this->path.c_str()) // Filename
+		<< "[" << this->idx << "]" // idx
 		<< (this->is_main ? " [MAIN]" : "") // is_main
 		<< (this->is_whitelisted ? " [WHITELISTED]" : "") // is_main
 		<< " [" << STREAM_POINTER_FORMAT << this->addr_range.first << "-" 
@@ -48,6 +51,7 @@ std::string Image::toStr()
 std::ostream& Ctx::operator<<(std::ostream& out, const Image& i)
 {
 	out << "{" // Opening
+		<< "\"idx\":" << i.idx << ","
 		<< "\"path\":" << EsteUtils::json_escape(i.path) << ","
 		<< "\"addr_range\":[" << i.addr_range.first << "," << i.addr_range.second << "],"
 		<< "\"addr_range_executable\":[";
@@ -64,6 +68,11 @@ std::ostream& Ctx::operator<<(std::ostream& out, const Image& i)
 		<< "}"; // Closing
 
 	return out;
+}
+
+const int32_t Image::getIdx() const
+{
+	return this->idx;
 }
 
 const std::string& Image::getPath() const 
@@ -103,4 +112,15 @@ bool Image::isWithinExecutableRange(ADDRINT addr) const
 		if (addr < r.second && addr > r.first)
 			return true;
 	return false;
+}
+
+int32_t Image::getExecutableSectionIdx(ADDRINT addr) const
+{
+	int32_t idx = 0;
+	for (auto& r : this->addr_range_executable) {
+		if (addr < r.second && addr > r.first)
+			return idx;
+		idx++;
+	}
+	return -1;
 }

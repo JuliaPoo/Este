@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="extLibs\tomlc99\toml.c" />
+    <ClCompile Include="src\ctx\bb.cpp" />
     <ClCompile Include="src\ctx\image.cpp" />
     <ClCompile Include="src\ctx\proc.cpp" />
     <ClCompile Include="src\Este.cpp" />
@@ -31,6 +32,7 @@
     <ClCompile Include="src\utils\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\include\Este\bb.hpp" />
     <ClInclude Include="src\include\Este\errors.hpp" />
     <ClInclude Include="src\include\Este\image.hpp" />
     <ClInclude Include="src\include\Este\instruments.hpp" />

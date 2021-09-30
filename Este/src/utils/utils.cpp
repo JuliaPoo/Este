@@ -45,3 +45,40 @@ std::string EsteUtils::json_escape(std::string const s)
     out += '\"';
     return out;
 }
+
+std::string EsteUtils::csv_escape(std::string const s)
+{
+    std::string out = "\"";
+    for (std::string::const_iterator i = s.begin(), end = s.end(); i != end; ++i) {
+        unsigned char c = *i;
+        if (' ' <= c and c <= '~' and c != '"') {
+            out += c;
+        }
+        else {
+            switch (c) {
+            case '"':  out += "\"\"";  break;
+            case '\t': out += "\\t";  break;
+            case '\r': out += "\\r";  break;
+            case '\n': out += "\\n";  break;
+            default:
+                char const* const hexdig = "0123456789ABCDEF";
+                out += '\\x';
+                out += hexdig[c >> 4];
+                out += hexdig[c & 0xF];
+            }
+        }
+    }
+    out += '\"';
+    return out;
+}
+
+std::string EsteUtils::toHex(const std::vector<uint8_t> s)
+{
+    std::string out;
+    char const* const hexdig = "0123456789ABCDEF";
+    for (auto c : s) {
+        out += hexdig[c >> 4];
+        out += hexdig[c & 0xf];
+    }
+    return out;
+}

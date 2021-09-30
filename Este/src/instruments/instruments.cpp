@@ -1,7 +1,8 @@
 #include "Este\instruments.hpp"
 #include "Este\errors.hpp"
-
 #include "Este\proc.hpp"
+#include "Este\image.hpp"
+#include "Este\bb.hpp"
 
 #include <pin.H>
 
@@ -22,9 +23,20 @@ VOID Fini(INT32 code, Ctx::Proc* procCtx)
 
 VOID ImageLoad(IMG img, Ctx::Proc* procCtx)
 {
-	Ctx::Image i(img);
+	Ctx::Image i(img, procCtx);
     procCtx->addImage(i);
 	LOGGING("Image loaded! %s", i.toStr().c_str());
+}
+
+VOID BblBef(ADDRINT instptr, THREADID tid, Ctx::Proc* procCtx, uint32_t bbl_size)
+{
+    // Log unique bb if not been encountered before
+    if (!procCtx->isBbExecuted(instptr)) {
+        Ctx::Bb bb(instptr, bbl_size, procCtx);
+        procCtx->addBb(bb);
+    }
+
+    // TODO: Add execution log
 }
 
 VOID Trace(TRACE trace, Ctx::Proc* procCtx)
@@ -36,9 +48,16 @@ VOID Trace(TRACE trace, Ctx::Proc* procCtx)
     if (img == NULL || img->isWhitelisted())
         return;
 
-    // TODO: Log the bb
     for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {
-        // BBL_InsertCall();
+        BBL_InsertCall(bbl, IPOINT_BEFORE, (AFUNPTR)BblBef,
+            IARG_INST_PTR,
+            IARG_THREAD_ID,
+            IARG_PTR, procCtx,
+            IARG_UINT32, BBL_Size(bbl),
+            IARG_END);
+        for (INS ins = BBL_InsHead(bbl); INS_Valid(ins); ins = INS_Next(ins)) {
+            // TODO: Instrument calls
+        }
     }
 }
 
