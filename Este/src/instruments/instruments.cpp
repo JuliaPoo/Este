@@ -31,7 +31,7 @@ VOID ImageLoad(IMG img, Ctx::Proc* procCtx)
 VOID BblBef(ADDRINT instptr, THREADID tid, Ctx::Proc* procCtx, uint32_t bbl_size)
 {
     // Log unique bb if not been encountered before
-    if (!procCtx->isBbExecuted(instptr)) {
+    if (!procCtx->isBbExecuted(instptr)) { // Early terminate
         Ctx::Bb bb(instptr, bbl_size, procCtx);
         procCtx->addBb(bb);
     }

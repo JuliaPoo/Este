@@ -26,6 +26,7 @@ namespace Ctx {
 		void addImage(Ctx::Image& img);
 
 		// Serializes bb into serial::bb (.bb.csv)
+		// Returns if bb already serialized
 		void addBb(Ctx::Bb& bb);
 
 		// Get image whereby addr is situated in. Returns NULL if not found.

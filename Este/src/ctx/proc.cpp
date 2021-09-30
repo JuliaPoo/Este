@@ -2,6 +2,7 @@
 #include "Este\serial.hpp"
 #include "Este\image.hpp"
 #include "Este\bb.hpp"
+#include "Este\errors.hpp"
 
 using namespace Ctx;
 
@@ -50,8 +51,13 @@ void Proc::addImage(Ctx::Image& img)
 
 void Proc::addBb(Ctx::Bb& bb)
 {
-	// Add bb
 	auto w = this->_bbs_lock.writer_aquire();
+	// Check if bb exists already
+	if (this->bbs.find(bb.getAddrRange().first) != this->bbs.end()) {
+		this->_bbs_lock.writer_release(w);
+		return;
+	}
+	// Add bb
 	this->bbs.insert(std::make_pair(bb.getAddrRange().first, bb.getIdx()));
 	this->_bbs_lock.writer_release(w);
 
