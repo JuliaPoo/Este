@@ -21,7 +21,7 @@ Bb::Bb(const ADDRINT low_addr, const uint32_t size, const Proc* proc)
 	else {
 		const auto img2 = proc->getImage(baddr);
 		if (img2) {
-			this->image_idx = img->getIdx();
+			this->image_idx = img2->getIdx();
 			this->section_idx = -1;
 		}
 		else {
