@@ -36,7 +36,10 @@ VOID BblBef(ADDRINT instptr, THREADID tid, Ctx::Proc* procCtx, uint32_t bbl_size
         procCtx->addBb(bb);
     }
 
-    // TODO: Add execution log
+    // Log execution of bb
+    NATIVE_TID os_tid; OS_GetTid(&os_tid);
+    Ctx::BbExecuted bbe(procCtx->getBbIdx(instptr), os_tid, tid);
+    procCtx->addBbExecuted(bbe);
 }
 
 VOID Trace(TRACE trace, Ctx::Proc* procCtx)
@@ -45,7 +48,7 @@ VOID Trace(TRACE trace, Ctx::Proc* procCtx)
 
     // Check if trace is within whitelisted binaries
     auto img = procCtx->getImageExecutable(taddr);
-    if (img == NULL || img->isWhitelisted())
+    if (!(img == NULL || img->isWhitelisted()))
         return;
 
     for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {

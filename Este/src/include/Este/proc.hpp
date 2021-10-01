@@ -7,6 +7,7 @@ namespace Ctx // Forward declaration
 {
 	class Image;
 	class Bb;
+	class BbExecuted;
 }
 
 namespace Ctx {
@@ -26,8 +27,11 @@ namespace Ctx {
 		void addImage(Ctx::Image& img);
 
 		// Serializes bb into serial::bb (.bb.csv)
-		// Returns if bb already serialized
+		// Does nothing if bb already serialized
 		void addBb(Ctx::Bb& bb);
+
+		// Serializes BbExecuted into serial::trace (.trace.csv)
+		void addBbExecuted(Ctx::BbExecuted& bbe);
 
 		// Get image whereby addr is situated in. Returns NULL if not found.
 		const Image* getImage(ADDRINT addr) const;
@@ -43,7 +47,10 @@ namespace Ctx {
 		// Get number of bbs
 		const int32_t getNumBb() const;
 
-		// Check if bb already executed once
+		// Get bb idx
+		const uint32_t getBbIdx(ADDRINT low_addr) const;
+
+		// Check if bb already executed once.
 		bool isBbExecuted(ADDRINT addr_low) const;
 
 	private:
@@ -59,6 +66,9 @@ namespace Ctx {
 
 		// Lock that ensures safe access into serial::bb
 		Sync::RW _serial_bb_lock;
+
+		// Lock that ensures safe access into serial::trace
+		Sync::RW _serial_trace_lock;
 
 		// All images loaded
 		std::vector<Image> images;

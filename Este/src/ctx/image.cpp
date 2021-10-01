@@ -34,8 +34,8 @@ Image::Image(const IMG img, const Proc* proc)
 std::string Image::toStr()
 {
 	std::stringstream ret;
-	ret << __get_filename_from_fullpath(this->path.c_str()) // Filename
-		<< "[" << this->idx << "]" // idx
+	ret << "[" << this->idx << "] " // idx
+		<< __get_filename_from_fullpath(this->path.c_str()) // Filename
 		<< (this->is_main ? " [MAIN]" : "") // is_main
 		<< (this->is_whitelisted ? " [WHITELISTED]" : "") // is_main
 		<< " [" << STREAM_POINTER_FORMAT << this->addr_range.first << "-" 

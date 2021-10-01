@@ -9,7 +9,8 @@ namespace Ctx { // Forward declaration
 // TODO: Deal with routine calls
 namespace Ctx {
 
-	// Bb object represents a basic block
+	// Bb object represents a basic block, 
+	// contains information relating to said basic block
 	// Object is never stored in memory, 
 	// but instead is directly serialized into .bb file
 	class Bb {
@@ -54,5 +55,31 @@ namespace Ctx {
 		// std::vector<int32_t> routines_called;
 	};
 
+	// BbExecuted is a class that represents the execution of a basic block
+	// While Bb stores info about the basic block, BbExecuted stores info
+	// about how the block was executed.
+	class BbExecuted
+	{
+	public:
+
+		// Constructor
+		BbExecuted(uint32_t bb_idx, OS_THREAD_ID os_tid, THREADID pin_tid);
+
+		// Serializer friend declaration
+		friend std::ostream& operator<<(std::ostream& out, const BbExecuted& bbe);
+
+	private:
+
+		// Index of basic block executed
+		uint32_t bb_idx = 0xffffffff;
+
+		// OS's Thread id that executed block
+		OS_THREAD_ID os_tid = 0xffffffff;
+
+		// Pin's Thread id that executed block
+		THREADID pin_tid = 0xffffffff;
+	};
+
 	std::ostream& operator<<(std::ostream& out, const Bb& bb);
+	std::ostream& operator<<(std::ostream& out, const BbExecuted& bbe);
 }

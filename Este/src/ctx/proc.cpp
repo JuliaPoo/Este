@@ -11,14 +11,18 @@ Proc::Proc()
 	NATIVE_PID pid; OS_GetPid(&pid);
 
 	// Write headers for Db
-	Serial::getDb()
+	Serial::getDbSerial()
 		<< "{" // Open
 		<< "\"pid\":" << pid << ","
 		<< "\"binaries_loaded\":" << "["; // Open list for binaries
 
 	// Write headers for Bb
-	auto& bb_serial = Serial::getBb();
+	auto& bb_serial = Serial::getBbSerial();
 	bb_serial << "idx,addr_low,addr_high,bytes,image_idx,section_idx\n";
+
+	// Write headers for trace
+	auto& trace_serial = Serial::getTraceSerial();
+	trace_serial << "bb_idx,os_tid,pin_tid\n";
 }
 
 Proc::~Proc()
@@ -28,12 +32,14 @@ Proc::~Proc()
 	this->_serial_db_lock.writer_aquire();
 	this->_bbs_lock.writer_aquire();
 	this->_serial_bb_lock.writer_aquire();
+	this->_serial_trace_lock.writer_aquire();
 
-	Serial::getDb()
+	Serial::getDbSerial()
 		<< "]"  // Close list for binaries
 		<< "}"; // Close
-	Serial::getDb().flush();
-	Serial::getBb().flush();
+	Serial::getDbSerial().flush();
+	Serial::getBbSerial().flush();
+	Serial::getTraceSerial().flush();
 }
 
 void Proc::addImage(Ctx::Image& img)
@@ -45,7 +51,7 @@ void Proc::addImage(Ctx::Image& img)
 
 	// Serialize img
 	w = this->_serial_db_lock.writer_aquire();
-	Serial::getDb() << (this->images.size() == 1 ? "" : ",") << img;
+	Serial::getDbSerial() << (this->images.size() == 1 ? "" : ",") << img;
 	this->_serial_db_lock.writer_release(w);
 }
 
@@ -63,8 +69,16 @@ void Proc::addBb(Ctx::Bb& bb)
 
 	// Serialize bb
 	w = this->_serial_bb_lock.writer_aquire();
-	Serial::getBb() << bb;
+	Serial::getBbSerial() << bb;
 	this->_serial_bb_lock.writer_release(w);
+}
+
+void Proc::addBbExecuted(Ctx::BbExecuted& bbe)
+{
+	// Serialize bbe
+	auto w = this->_serial_trace_lock.writer_aquire();
+	Serial::getTraceSerial() << bbe;
+	this->_serial_trace_lock.writer_release(w);
 }
 
 const Image* Proc::getImage(ADDRINT addr) const
@@ -109,10 +123,22 @@ const int32_t Proc::getNumBb() const
 	return ret;
 }
 
+const uint32_t Proc::getBbIdx(ADDRINT low_addr) const
+{
+	auto r = const_cast<Proc*>(this)->_bbs_lock.reader_aquire();
+	auto it = this->bbs.find(low_addr);
+	if (it == this->bbs.end())
+		RAISE_EXCEPTION("`getBbIdx` when bb doesnt exist!");
+	uint32_t ret = it->second;
+	const_cast<Proc*>(this)->_bbs_lock.reader_release(r);
+	return ret;
+}
+
 bool Proc::isBbExecuted(ADDRINT addr_low) const
 {
 	auto r = const_cast<Proc*>(this)->_bbs_lock.reader_aquire();
-	bool ret = this->bbs.find(addr_low) != this->bbs.end();
+	auto it = this->bbs.find(addr_low);
+	bool ret = it != this->bbs.end();
 	const_cast<Proc*>(this)->_bbs_lock.reader_release(r);
 	return ret;
 }
