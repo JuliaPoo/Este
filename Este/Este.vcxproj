@@ -38,7 +38,6 @@
     <ClInclude Include="src\include\Este\image.hpp" />
     <ClInclude Include="src\include\Este\instruments.hpp" />
     <ClInclude Include="src\include\Este\knobs.hpp" />
-    <ClInclude Include="src\include\Este\mt_map.hpp" />
     <ClInclude Include="src\include\Este\proc.hpp" />
     <ClInclude Include="src\include\Este\rtn.hpp" />
     <ClInclude Include="src\include\Este\serial.hpp" />

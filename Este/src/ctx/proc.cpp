@@ -23,7 +23,7 @@ Proc::Proc()
 
 	// Write headers for trace
 	auto& trace_serial = Serial::getTraceSerial();
-	trace_serial << "bb_idx,os_tid,pin_tid\n";
+	trace_serial << "bb_idx,os_tid,pin_tid,rtn_called_idx\n";
 
 	// Write headers for rtn
 	auto& rtn_serial = Serial::getRtnSerial();
@@ -171,7 +171,7 @@ const uint32_t Proc::getBbIdx(ADDRINT low_addr) const
 	auto r = const_cast<Proc*>(this)->_bbs_lock.reader_aquire();
 	auto it = this->bbs.find(low_addr);
 	if (it == this->bbs.end())
-		RAISE_EXCEPTION("`getBbIdx` when bb doesnt exist!");
+		RAISE_EXCEPTION("`getBb` when bb doesnt exist! %p", (void*)low_addr);
 	uint32_t ret = it->second;
 	const_cast<Proc*>(this)->_bbs_lock.reader_release(r);
 	return ret;

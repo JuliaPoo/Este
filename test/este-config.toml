@@ -11,4 +11,4 @@ output-dir = "Este-out"
 
 # binary-whitelist @type List[str]:
 #    Este will analyse only binaries in this list
-binary-whitelist = ["notepad.exe"]
+binary-whitelist = ["a-32.exe"]

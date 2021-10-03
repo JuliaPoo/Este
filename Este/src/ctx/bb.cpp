@@ -41,8 +41,7 @@ Bb::Bb(const CONTEXT* pinctx, const Proc* proc, const ADDRINT low_addr, const ui
 		}
 	}
 
-	// TODO: Add routines
-	this->build(pinctx, proc);
+	this->build();
 }
 
 std::ostream& Ctx::operator<<(std::ostream& out, const Bb& bb)
@@ -73,7 +72,7 @@ const uint32_t Bb::getSize() const
 	return this->size;
 }
 
-const xed_decoded_inst_t Bb::_disassemble(const ADDRINT addr, uint32_t& out_size)
+const xed_decoded_inst_t Bb::disassemble(const ADDRINT addr, uint32_t& out_size)
 {
 	xed_state_t dstate;
 	xed_decoded_inst_t ret = { 0 };
@@ -114,7 +113,7 @@ end:
 	return ret;
 }
 
-const std::string Bb::_inst_to_str(const ADDRINT addr, const xed_decoded_inst_t& inst)
+const std::string Bb::inst_to_str(const ADDRINT addr, const xed_decoded_inst_t& inst)
 {
 	char ret[64] = { 0 };
 
@@ -133,17 +132,15 @@ const std::string Bb::_inst_to_str(const ADDRINT addr, const xed_decoded_inst_t&
 	return ret_str;
 }
 
-ADDRINT Bb::get_rtn_addr_call_jmp(
+ADDRINT Bb::get_rtn_addr_call_jmp_from_operand(
 	const CONTEXT* pinctx, const xed_decoded_inst_t& inst, 
-	const ADDRINT inst_addr, const uint32_t op_idx, const uint32_t memop_idx, 
-	bool& addr_is_dynamic)
+	const ADDRINT inst_addr, const uint32_t op_idx, const uint32_t memop_idx)
 {
 	auto xi = *xed_decoded_inst_inst(&inst);
 	const xed_operand_t* op = xed_inst_operand(&xi, op_idx);
 	xed_operand_enum_t op_name = xed_operand_name(op);
 
 	ADDRINT ret = 0;
-	addr_is_dynamic = false;
 
 	switch (op_name)
 	{
@@ -155,14 +152,12 @@ ADDRINT Bb::get_rtn_addr_call_jmp(
 		if (xed_base == XED_REG_INSTPTR)
 			ret += inst_addr + xed_decoded_inst_get_length(&inst);
 		else if (xed_base != XED_REG_INVALID) {
-			addr_is_dynamic = true;
 			ADDRINT val = 0;
 			PIN_GetContextRegval(pinctx, INS_XedExactMapToPinReg(xed_base), reinterpret_cast<uint8_t*>(&val));
 			ret += val;
 		}
 		auto xed_index = xed_decoded_inst_get_index_reg(&inst, memop_idx);
 		if (xed_index != XED_REG_INVALID) {
-			addr_is_dynamic = true;
 			ADDRINT val = 0;
 			PIN_GetContextRegval(pinctx, INS_XedExactMapToPinReg(xed_index), reinterpret_cast<uint8_t*>(&val));
 			xed_uint_t scale = xed_decoded_inst_get_scale(&inst, memop_idx);
@@ -198,86 +193,72 @@ ADDRINT Bb::get_rtn_addr_call_jmp(
 		ADDRINT val = 0;
 		PIN_GetContextRegval(pinctx, INS_XedExactMapToPinReg(xed_reg), reinterpret_cast<uint8_t*>(&val));
 		ret += val;
-		addr_is_dynamic = xed_reg != XED_REG_INSTPTR;
 		break;
 	}
 
 	default:
 		RAISE_EXCEPTION("`get_addr_of_memop` operand isn't a memop! %s:%d:%d:%s",
-			xed_operand_enum_t2str(op_name), op_idx, memop_idx, Bb::_inst_to_str(inst_addr, inst).c_str());
+			xed_operand_enum_t2str(op_name), op_idx, memop_idx, Bb::inst_to_str(inst_addr, inst).c_str());
 	}
 
 	return ret;
 }
 
-bool Bb::process_inst(const CONTEXT* pinctx, const Proc* proc, const ADDRINT inst_addr, const xed_decoded_inst_t& inst)
+ADDRINT Bb::get_target_addr_from_call_jmp(
+	const CONTEXT* pinctx, const Proc* proc, 
+	const ADDRINT inst_addr, const xed_decoded_inst_t& inst)
 {
 	auto opcode = xed_decoded_inst_get_iclass(&inst);
 	ADDRINT rtn_addr = 0;
-	bool rnt_addr_is_dynamic;
 
 	switch (opcode) {
 	case XED_ICLASS_CALL_NEAR: // Exclude CALL_FAR and JMP_FAR
 	case XED_ICLASS_JMP:
-		rtn_addr = get_rtn_addr_call_jmp(pinctx, inst, inst_addr, 0, 0, rnt_addr_is_dynamic);
+		rtn_addr = get_rtn_addr_call_jmp_from_operand(pinctx, inst, inst_addr, 0, 0);
 	}
 
-	if (rtn_addr) {
-
-		std::stringstream rtn_name;
-		auto img = proc->getImageExecutable(rtn_addr);
-
-		// Log only routine calls outside of whitelist
-		if (img != NULL && !img->isWhitelisted()) {
-			auto rtn = proc->getRtn(rtn_addr);
-			if (rtn != NULL) rtn_name << rtn->getName();
-			else rtn_name << "sub_" << std::hex << rtn_addr;
-
-			LOGGING("--! %s ==> %p!%s %s",
-				this->_inst_to_str(inst_addr, inst).c_str(),
-				(void*)rtn_addr, rtn_name.str().c_str(),
-				rnt_addr_is_dynamic ? "[DYNAMIC]" : "");
-			goto end;
-		}
-	} 
-	LOGGING("--  %s", this->_inst_to_str(inst_addr, inst).c_str());
-
-end:
-	return rnt_addr_is_dynamic;
+	return rtn_addr;
 }
 
-void Bb::build(const CONTEXT* pinctx, const Proc* proc)
+int32_t Bb::build()
 {
 	uint32_t ptr = 0;
-	LOGGING("%p:", (void*)this->addr);
+	uint32_t sz;
+	ADDRINT rtn_addr = 0;
+	int32_t rtn_idx = -1;
+
+	//LOGGING("%p:", (void*)this->addr);
 	while (ptr < this->size) {
-		uint32_t sz = 0;
-		auto inst = this->_disassemble(this->addr + ptr, sz);
-		this->process_inst(pinctx, proc, this->addr + ptr, inst);
+		auto inst = this->disassemble(this->addr + ptr, sz);
+		//LOGGING("--  %s", Bb::_inst_to_str(this->addr + ptr, inst).c_str());
 		ptr += sz;
 	}
-	LOGGING("");
+	//LOGGING("");
 
 	// Update size (because PIN sometimes gets it wrong)
 	if (this->size != ptr) {
 		this->size = ptr;
 		this->bytes.assign(reinterpret_cast<char*>(this->addr), reinterpret_cast<char*>(this->addr + ptr));
 	}
+
+	return rtn_idx;
 }
 
 
-BbExecuted::BbExecuted(uint32_t bb_idx, OS_THREAD_ID os_tid, THREADID pin_tid)
+BbExecuted::BbExecuted(uint32_t bb_idx, OS_THREAD_ID os_tid, THREADID pin_tid, int32_t rtn_called_idx)
 {
 	this->bb_idx = bb_idx;
 	this->os_tid = os_tid;
 	this->pin_tid = pin_tid;
+	this->rtn_called_idx = rtn_called_idx;
 }
 
 std::ostream& Ctx::operator<<(std::ostream& out, const BbExecuted& bbe)
 {
-	out << bbe.bb_idx << "," // bb idx
-		<< bbe.os_tid << "," // tid
-		<< bbe.pin_tid // pin tid
+	out << bbe.bb_idx << ',' // bb idx
+		<< bbe.os_tid << ',' // tid
+		<< bbe.pin_tid << ',' // pin tid
+		<< bbe.rtn_called_idx
 		<< "\n"; // End entry
 
 	return out;

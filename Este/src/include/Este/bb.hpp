@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pin.H>
+#include <unordered_map>
 
 namespace Ctx { // Forward declaration
 	class Proc;
@@ -17,13 +18,6 @@ namespace Ctx {
 
 	public:
 
-		// Represents an instruction that called a routine
-		typedef struct {
-			std::vector<int32_t> rtn_idx;
-			ADDRINT inst_addr;
-			bool is_dynamic;
-		} RtnCall;
-
 		// Default constructor
 		Bb();
 
@@ -32,9 +26,6 @@ namespace Ctx {
 
 		// Serializer friend declaration
 		friend std::ostream& operator<<(std::ostream& out, const Bb& bb);
-
-		// Add routine called
-		// void addRoutineCalled(const Routine& rtn);
 
 		// Get idx of `this`
 		const int32_t getIdx() const;
@@ -45,21 +36,28 @@ namespace Ctx {
 		// Get size of bb
 		const uint32_t getSize() const;
 
+		// Returns xed decoded structure given address.
+		// Fills out `out_size` with the size of instruction in bytes.
+		static const xed_decoded_inst_t disassemble(const ADDRINT addr, uint32_t& out_size);
+
+		// Disassembles instruction as string
+		static const std::string inst_to_str(const ADDRINT addr, const xed_decoded_inst_t& inst);
+
+		// Returns address of target from a call or jmp instruction.
+		// Returns NULL if inst isn't a call or jmp.
+		static ADDRINT get_target_addr_from_call_jmp(
+			const CONTEXT * pinctx, const Proc * proc,
+			const ADDRINT inst_addr, const xed_decoded_inst_t & inst);
+
 	private:
 
-		static const xed_decoded_inst_t _disassemble(const ADDRINT addr, uint32_t& out_size);
-
-		static const std::string _inst_to_str(const ADDRINT addr, const xed_decoded_inst_t& inst);
-
-		static ADDRINT get_rtn_addr_call_jmp(
+		// Intepretes target address from operand of call/jmp
+		static ADDRINT get_rtn_addr_call_jmp_from_operand(
 			const CONTEXT* pinctx, const xed_decoded_inst_t& inst, 
-			const ADDRINT inst_addr, const uint32_t op_idx, const uint32_t memop_idx, 
-			bool& addr_is_dynamic);
+			const ADDRINT inst_addr, const uint32_t op_idx, const uint32_t memop_idx);
 
-		// Returns true if jump address is dynamic
-		bool process_inst(const CONTEXT* pinctx, const Proc* proc, const ADDRINT inst_addr, const xed_decoded_inst_t& inst);
-
-		void build(const CONTEXT* pinctx, const Proc* proc);
+		// Properly sets this->size and this->bytes
+		int32_t build();
 
 		/* To be serialized */
 
@@ -81,8 +79,8 @@ namespace Ctx {
 		// Index of executable section of the binary Bb is located in (-1 if image_idx=-1)
 		int32_t section_idx = -1;
 
-		// Indices of routines that's directly called in Bb
-		std::vector<int32_t> routines_called;
+		// If basic block has a routine call out of whitelisted
+		bool has_rtn_call_out_of_whitelisted = false;
 	};
 
 	// BbExecuted is a class that represents the execution of a basic block
@@ -93,7 +91,7 @@ namespace Ctx {
 	public:
 
 		// Constructor
-		BbExecuted(uint32_t bb_idx, OS_THREAD_ID os_tid, THREADID pin_tid);
+		BbExecuted(uint32_t bb_idx, OS_THREAD_ID os_tid, THREADID pin_tid, int32_t rtn_called_idx);
 
 		// Serializer friend declaration
 		friend std::ostream& operator<<(std::ostream& out, const BbExecuted& bbe);
@@ -108,6 +106,9 @@ namespace Ctx {
 
 		// Pin's Thread id that executed block
 		THREADID pin_tid = 0xffffffff;
+
+		// Index of routine called.
+		int32_t rtn_called_idx = -1;
 	};
 
 	std::ostream& operator<<(std::ostream& out, const Bb& bb);

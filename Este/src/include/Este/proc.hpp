@@ -31,7 +31,7 @@ namespace Ctx {
 		// Does nothing if rtn already serialized
 		void addRtn(const Ctx::Rtn& rtn);
 
-		// Serializes bb into serial::bb (.bb.csv)
+		// Adds bb to bbs
 		// Does nothing if bb already serialized
 		void addBb(const Ctx::Bb& bb);
 
@@ -58,7 +58,7 @@ namespace Ctx {
 		// Get number of bbs
 		const int32_t getNumBb() const;
 
-		// Get bb idx
+		// Get bb index
 		const uint32_t getBbIdx(ADDRINT low_addr) const;
 
 		// Check if bb already executed once.
@@ -99,6 +99,6 @@ namespace Ctx {
 
 		// All unique bb encountered
 		// lower address : bb index inside .bb.csv file (starting from 0)
-		std::tr1::unordered_map<ADDRINT, int32_t> bbs;
+		std::tr1::unordered_map<ADDRINT, uint32_t> bbs;
 	};
 }
