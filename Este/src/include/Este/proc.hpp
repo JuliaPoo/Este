@@ -8,6 +8,7 @@ namespace Ctx // Forward declaration
 	class Image;
 	class Bb;
 	class BbExecuted;
+	class Rtn;
 }
 
 namespace Ctx {
@@ -24,14 +25,21 @@ namespace Ctx {
 		// std::ostream& operator<<(std::ostream& out) const;
 
 		// Adds image to this->images and serializes it into serial::db (.este.json)
-		void addImage(Ctx::Image& img);
+		void addImage(const Ctx::Image& img);
+
+		// Serializes rtn into serial::rtn (.rtn.csv)
+		// Does nothing if rtn already serialized
+		void addRtn(const Ctx::Rtn& rtn);
 
 		// Serializes bb into serial::bb (.bb.csv)
 		// Does nothing if bb already serialized
-		void addBb(Ctx::Bb& bb);
+		void addBb(const Ctx::Bb& bb);
 
 		// Serializes BbExecuted into serial::trace (.trace.csv)
-		void addBbExecuted(Ctx::BbExecuted& bbe);
+		void addBbExecuted(const Ctx::BbExecuted& bbe);
+
+		// Get routine that starts at addr. Returns NULL if not found.
+		const Rtn* getRtn(ADDRINT addr) const;
 
 		// Get image whereby addr is situated in. Returns NULL if not found.
 		const Image* getImage(ADDRINT addr) const;
@@ -44,6 +52,9 @@ namespace Ctx {
 		// Get number of images
 		const int32_t getNumImages() const;
 
+		// Get number of routines
+		const int32_t getNumRtn() const;
+
 		// Get number of bbs
 		const int32_t getNumBb() const;
 
@@ -52,6 +63,9 @@ namespace Ctx {
 
 		// Check if bb already executed once.
 		bool isBbExecuted(ADDRINT addr_low) const;
+
+		// Checks if routine has already been serialized
+		bool isRtnSerialized(ADDRINT addr) const;
 
 	private:
 
@@ -64,6 +78,12 @@ namespace Ctx {
 		// Lock that ensures safe access into this->bbs
 		Sync::RW _bbs_lock;
 
+		// Lock that ensures safe access into serial::rtn
+		Sync::RW _serial_rtn_lock;
+
+		// Lock that ensures safe access into this->rtns
+		Sync::RW _rtns_lock;
+
 		// Lock that ensures safe access into serial::bb
 		Sync::RW _serial_bb_lock;
 
@@ -72,6 +92,10 @@ namespace Ctx {
 
 		// All images loaded
 		std::vector<Image> images;
+
+		// All routines encountered
+		// starting address : rtn object
+		std::tr1::unordered_map<ADDRINT, Rtn> rtns;
 
 		// All unique bb encountered
 		// lower address : bb index inside .bb.csv file (starting from 0)

@@ -3,6 +3,8 @@
 #include "Este\proc.hpp"
 #include "Este\image.hpp"
 #include "Este\bb.hpp"
+#include "Este\rtn.hpp"
+#include "Este\mt_map.hpp"
 
 #include <pin.H>
 
@@ -28,11 +30,11 @@ VOID ImageLoad(IMG img, Ctx::Proc* procCtx)
 	LOGGING("Image loaded! %s", i.toStr().c_str());
 }
 
-VOID BblBef(ADDRINT instptr, THREADID tid, Ctx::Proc* procCtx, uint32_t bbl_size)
+VOID BblBef(const CONTEXT* pinctx, ADDRINT instptr, THREADID tid, Ctx::Proc* procCtx, uint32_t bbl_size)
 {
     // Log unique bb if not been encountered before
     if (!procCtx->isBbExecuted(instptr)) { // Early terminate
-        Ctx::Bb bb(instptr, bbl_size, procCtx);
+        Ctx::Bb bb(pinctx, procCtx, instptr, bbl_size);
         procCtx->addBb(bb);
     }
 
@@ -52,16 +54,23 @@ VOID Trace(TRACE trace, Ctx::Proc* procCtx)
         return;
 
     for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {
+
         BBL_InsertCall(bbl, IPOINT_BEFORE, (AFUNPTR)BblBef,
+            IARG_CONST_CONTEXT,
             IARG_INST_PTR,
             IARG_THREAD_ID,
             IARG_PTR, procCtx,
             IARG_UINT32, BBL_Size(bbl),
             IARG_END);
-        for (INS ins = BBL_InsHead(bbl); INS_Valid(ins); ins = INS_Next(ins)) {
-            // TODO: Instrument calls
-        }
     }
+}
+
+VOID Rtn(RTN rtn, Ctx::Proc* procCtx)
+{
+    if (procCtx->isBbExecuted(RTN_Address(rtn)))
+        return;
+    Ctx::Rtn r(rtn, procCtx);
+    procCtx->addRtn(r);
 }
 
 void Instrument::Init_callbacks()
@@ -78,4 +87,7 @@ void Instrument::Init_callbacks()
 
     // Basic Blocks
     TRACE_AddInstrumentFunction((TRACE_INSTRUMENT_CALLBACK)Trace, procCtx);
+
+    // Routines
+    RTN_AddInstrumentFunction((RTN_INSTRUMENT_CALLBACK)Rtn, procCtx);
 }

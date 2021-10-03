@@ -23,6 +23,7 @@
     <ClCompile Include="src\ctx\bb.cpp" />
     <ClCompile Include="src\ctx\image.cpp" />
     <ClCompile Include="src\ctx\proc.cpp" />
+    <ClCompile Include="src\ctx\rtn.cpp" />
     <ClCompile Include="src\Este.cpp" />
     <ClCompile Include="src\instruments\instruments.cpp" />
     <ClCompile Include="src\utils\errors.cpp" />
@@ -37,7 +38,9 @@
     <ClInclude Include="src\include\Este\image.hpp" />
     <ClInclude Include="src\include\Este\instruments.hpp" />
     <ClInclude Include="src\include\Este\knobs.hpp" />
+    <ClInclude Include="src\include\Este\mt_map.hpp" />
     <ClInclude Include="src\include\Este\proc.hpp" />
+    <ClInclude Include="src\include\Este\rtn.hpp" />
     <ClInclude Include="src\include\Este\serial.hpp" />
     <ClInclude Include="src\include\Este\sync.hpp" />
     <ClInclude Include="src\include\Este\utils.hpp" />
