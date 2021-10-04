@@ -60,6 +60,9 @@
     <ClCompile Include="src\ctx\bb.cpp">
       <Filter>Source Files\ctx</Filter>
     </ClCompile>
+    <ClCompile Include="src\ctx\rtn.cpp">
+      <Filter>Source Files\ctx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\include\Este\knobs.hpp">
@@ -87,6 +90,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\include\Este\bb.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\Este\rtn.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

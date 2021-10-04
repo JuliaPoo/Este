@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cctype>
 
-bool EsteUtils::hasSuffix(std::string const& str, std::string const& suffix)
+bool EsteUtils::hasSuffix(const std::string& str, const std::string& suffix)
 {
     if (str.length() >= suffix.length())
         return (0 == str.compare(str.length() - suffix.length(), suffix.length(), suffix));
@@ -18,7 +18,7 @@ std::string& EsteUtils::toLower(std::string& str)
     return str;
 }
 
-std::string EsteUtils::json_escape(std::string const s) 
+std::string EsteUtils::json_escape(const std::string s)
 {
     std::string out = "\"";
     for (std::string::const_iterator i = s.begin(), end = s.end(); i != end; ++i) {
@@ -46,7 +46,7 @@ std::string EsteUtils::json_escape(std::string const s)
     return out;
 }
 
-std::string EsteUtils::csv_escape(std::string const s)
+std::string EsteUtils::csv_escape(const std::string s)
 {
     std::string out = "\"";
     for (std::string::const_iterator i = s.begin(), end = s.end(); i != end; ++i) {
@@ -62,7 +62,7 @@ std::string EsteUtils::csv_escape(std::string const s)
             case '\n': out += "\\n";  break;
             default:
                 char const* const hexdig = "0123456789ABCDEF";
-                out += '\\x';
+                out += "\\x";
                 out += hexdig[c >> 4];
                 out += hexdig[c & 0xF];
             }

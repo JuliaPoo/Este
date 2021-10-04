@@ -17,8 +17,6 @@ namespace Ctx
 
 	public:
 
-		Image() {};
-
 		// Initialise itself from PIN
 		Image(const IMG img, const Proc* proc);
 

@@ -3,10 +3,12 @@
 std::ofstream db;
 std::ofstream bb;
 std::ofstream trace;
+std::ofstream rtn;
 
 void Serial::Init_serializers(
 	std::string db_filepath,
     std::string bb_filepath,
+	std::string rtn_filepath,
 	std::string trace_filepath
 )
 {
@@ -17,6 +19,10 @@ void Serial::Init_serializers(
     new (&bb) decltype(bb)(
         bb_filepath.c_str(),
         std::ios::out | std::ios::binary);
+
+	new (&rtn) decltype(rtn)(
+		rtn_filepath.c_str(),
+		std::ios::out | std::ios::binary);
 
 	new (&trace) decltype(trace)(
 		trace_filepath.c_str(),
@@ -31,6 +37,11 @@ std::ofstream& Serial::getDbSerial()
 std::ofstream& Serial::getBbSerial()
 {
     return bb;
+}
+
+std::ofstream& Serial::getRtnSerial()
+{
+	return rtn;
 }
 
 std::ofstream& Serial::getTraceSerial()

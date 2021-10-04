@@ -9,6 +9,7 @@ namespace Serial {
 	void Init_serializers(
 		std::string db_filepath,
 		std::string bb_filepath,
+		std::string rtn_filepath,
 		std::string trace_filepath
 	);
 
@@ -19,6 +20,10 @@ namespace Serial {
 	// Returns serializer to .bb.csv file
 	// Contains information of all basic blocks executed (within whitelisted binaries)
 	std::ofstream& getBbSerial();
+
+	// Returns serializer to .rtn.csv file
+	// Contains information of all routines executed.
+	std::ofstream& getRtnSerial();
 
 	// Returns serializer to .trace.csv file
 	// Contains information of all basic blocks executed in order

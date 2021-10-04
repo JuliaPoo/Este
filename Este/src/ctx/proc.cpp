@@ -1,6 +1,7 @@
 #include "Este\proc.hpp"
 #include "Este\serial.hpp"
 #include "Este\image.hpp"
+#include "Este\rtn.hpp"
 #include "Este\bb.hpp"
 #include "Este\errors.hpp"
 
@@ -16,13 +17,17 @@ Proc::Proc()
 		<< "\"pid\":" << pid << ","
 		<< "\"binaries_loaded\":" << "["; // Open list for binaries
 
-	// Write headers for Bb
+	// Write headers for bb
 	auto& bb_serial = Serial::getBbSerial();
-	bb_serial << "idx,addr_low,addr_high,bytes,image_idx,section_idx\n";
+	bb_serial << "idx,addr,size,bytes,image_idx,section_idx\n";
 
 	// Write headers for trace
 	auto& trace_serial = Serial::getTraceSerial();
-	trace_serial << "bb_idx,os_tid,pin_tid\n";
+	trace_serial << "bb_idx,os_tid,pin_tid,rtn_called_idx\n";
+
+	// Write headers for rtn
+	auto& rtn_serial = Serial::getRtnSerial();
+	rtn_serial << "idx,addr,rtn_name,image_idx,section_idx\n";
 }
 
 Proc::~Proc()
@@ -32,17 +37,20 @@ Proc::~Proc()
 	this->_serial_db_lock.writer_aquire();
 	this->_bbs_lock.writer_aquire();
 	this->_serial_bb_lock.writer_aquire();
+	this->_rtns_lock.writer_aquire();
+	this->_serial_rtn_lock.writer_aquire();
 	this->_serial_trace_lock.writer_aquire();
 
 	Serial::getDbSerial()
 		<< "]"  // Close list for binaries
-		<< "}"; // Close
+		   "}"; // Close
 	Serial::getDbSerial().flush();
 	Serial::getBbSerial().flush();
+	Serial::getRtnSerial().flush();
 	Serial::getTraceSerial().flush();
 }
 
-void Proc::addImage(Ctx::Image& img)
+void Proc::addImage(const Ctx::Image& img)
 {
 	// Add image
 	auto w = this->_images_lock.writer_aquire();
@@ -55,16 +63,34 @@ void Proc::addImage(Ctx::Image& img)
 	this->_serial_db_lock.writer_release(w);
 }
 
-void Proc::addBb(Ctx::Bb& bb)
+void Proc::addRtn(const Ctx::Rtn& rtn)
+{
+	auto w = this->_rtns_lock.writer_aquire();
+	// Check if rtn exists already
+	if (this->rtns.find(rtn.getAddr()) != this->rtns.end()) {
+		this->_rtns_lock.writer_release(w);
+		return;
+	}
+	// Add routine
+	this->rtns.insert(std::make_pair(rtn.getAddr(), rtn));
+	this->_rtns_lock.writer_release(w);
+
+	// Serialize routine
+	w = this->_serial_rtn_lock.writer_aquire();
+	Serial::getRtnSerial() << rtn;
+	this->_serial_rtn_lock.writer_release(w);
+}
+
+void Proc::addBb(const Ctx::Bb& bb)
 {
 	auto w = this->_bbs_lock.writer_aquire();
 	// Check if bb exists already
-	if (this->bbs.find(bb.getAddrRange().first) != this->bbs.end()) {
+	if (this->bbs.find(bb.getAddr()) != this->bbs.end()) {
 		this->_bbs_lock.writer_release(w);
 		return;
 	}
 	// Add bb
-	this->bbs.insert(std::make_pair(bb.getAddrRange().first, bb.getIdx()));
+	this->bbs.insert(std::make_pair(bb.getAddr(), bb.getIdx()));
 	this->_bbs_lock.writer_release(w);
 
 	// Serialize bb
@@ -73,12 +99,21 @@ void Proc::addBb(Ctx::Bb& bb)
 	this->_serial_bb_lock.writer_release(w);
 }
 
-void Proc::addBbExecuted(Ctx::BbExecuted& bbe)
+void Proc::addBbExecuted(const Ctx::BbExecuted& bbe)
 {
 	// Serialize bbe
 	auto w = this->_serial_trace_lock.writer_aquire();
 	Serial::getTraceSerial() << bbe;
 	this->_serial_trace_lock.writer_release(w);
+}
+
+const Rtn* Proc::getRtn(ADDRINT addr) const
+{
+	auto r = const_cast<Proc*>(this)->_rtns_lock.reader_aquire();
+	auto it = this->rtns.find(addr);
+	const Rtn* ret = it == this->rtns.end() ? NULL : &it->second;
+	const_cast<Proc*>(this)->_rtns_lock.reader_release(r);
+	return ret;
 }
 
 const Image* Proc::getImage(ADDRINT addr) const
@@ -115,6 +150,14 @@ const int32_t Proc::getNumImages() const
 	return ret;
 }
 
+const int32_t Proc::getNumRtn() const
+{
+	auto r = const_cast<Proc*>(this)->_rtns_lock.reader_aquire();
+	int32_t ret = this->rtns.size();
+	const_cast<Proc*>(this)->_rtns_lock.reader_release(r);
+	return ret;
+}
+
 const int32_t Proc::getNumBb() const
 {
 	auto r = const_cast<Proc*>(this)->_bbs_lock.reader_aquire();
@@ -128,7 +171,7 @@ const uint32_t Proc::getBbIdx(ADDRINT low_addr) const
 	auto r = const_cast<Proc*>(this)->_bbs_lock.reader_aquire();
 	auto it = this->bbs.find(low_addr);
 	if (it == this->bbs.end())
-		RAISE_EXCEPTION("`getBbIdx` when bb doesnt exist!");
+		RAISE_EXCEPTION("`getBb` when bb doesnt exist! %p", (void*)low_addr);
 	uint32_t ret = it->second;
 	const_cast<Proc*>(this)->_bbs_lock.reader_release(r);
 	return ret;
@@ -137,8 +180,15 @@ const uint32_t Proc::getBbIdx(ADDRINT low_addr) const
 bool Proc::isBbExecuted(ADDRINT addr_low) const
 {
 	auto r = const_cast<Proc*>(this)->_bbs_lock.reader_aquire();
-	auto it = this->bbs.find(addr_low);
-	bool ret = it != this->bbs.end();
+	bool ret = this->bbs.find(addr_low) != this->bbs.end();
 	const_cast<Proc*>(this)->_bbs_lock.reader_release(r);
+	return ret;
+}
+
+bool Proc::isRtnSerialized(ADDRINT addr) const
+{
+	auto r = const_cast<Proc*>(this)->_rtns_lock.reader_aquire();
+	bool ret = this->rtns.find(addr) != this->rtns.end();
+	const_cast<Proc*>(this)->_rtns_lock.reader_release(r);
 	return ret;
 }

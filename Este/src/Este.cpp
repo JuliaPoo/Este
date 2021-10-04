@@ -19,6 +19,7 @@ int main(int argc, char* argv[])
     Serial::Init_serializers(
         Knobs::getOutputPrefix() + ".este.json", // generic db
         Knobs::getOutputPrefix() + ".bb.csv", // basic blocks
+        Knobs::getOutputPrefix() + ".rtn.csv", // routines
         Knobs::getOutputPrefix() + ".trace.csv" // execution trace
     );
 
@@ -29,6 +30,7 @@ int main(int argc, char* argv[])
     Instrument::Init_callbacks();
 
     // Start!
+    PIN_InitSymbols();
     PIN_StartProgram();
 
     return 0;
