@@ -3,8 +3,12 @@ import os
 import json
 import pathlib
 
-IN_DIR = pathlib.Path(r"gen\Este-out")
-OUT_DIR = pathlib.Path(r"web\gen")
+# Make sure the post processing is ran in current directory
+CUR_DIR = os.path.dirname(os.path.realpath(__file__))
+os.chdir(CUR_DIR)
+
+IN_DIR = pathlib.Path(r"..\gen\Este-out")
+OUT_DIR = pathlib.Path(r"..\web\gen")
 
 def getPids() -> list:
     files = os.listdir(IN_DIR)

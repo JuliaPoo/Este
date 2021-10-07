@@ -3,7 +3,8 @@ from http.server import HTTPServer, CGIHTTPRequestHandler
 import webbrowser
 
 # Make sure the server is created at current directory
-os.chdir('./web')
+CUR_DIR = os.path.dirname(os.path.realpath(__file__))
+os.chdir(CUR_DIR)
 
 # Create server object listening the port 7777
 server_object = HTTPServer(
