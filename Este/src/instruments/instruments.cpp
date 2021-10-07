@@ -90,22 +90,39 @@ VOID BblAft(const CONTEXT* pinctx, ADDRINT instptr, ADDRINT bbl_addr, THREADID t
     procCtx->addBbExecuted(bbe);
 }
 
+VOID TraceExitedWhitelisted(Ctx::Proc* procCtx)
+{
+    Ctx::Thread* tctx = reinterpret_cast<decltype(tctx)>(
+        PIN_GetThreadData(tls_key, PIN_ThreadId()));
+
+    if (tctx->was_in_whitelisted_code) {
+        tctx->was_in_whitelisted_code = false;
+        procCtx->addBbOutOfWhitelisted(tctx->os_tid, tctx->pin_tid);
+    }
+}
+
+VOID TraceEnteredWhitelistedCode(Ctx::Proc* procCtx)
+{
+    Ctx::Thread* tctx = reinterpret_cast<decltype(tctx)>(
+        PIN_GetThreadData(tls_key, PIN_ThreadId()));
+    tctx->was_in_whitelisted_code = true;
+}
+
 VOID Trace(TRACE trace, Ctx::Proc* procCtx)
 {
     auto taddr = TRACE_Address(trace);
-    Ctx::Thread* tctx = reinterpret_cast<decltype(tctx)>(
-        PIN_GetThreadData(tls_key, PIN_ThreadId()));
 
     // Check if trace is within whitelisted binaries
     auto img = procCtx->getImageExecutable(taddr);
     if (!(img == NULL || img->isWhitelisted())) {
-        if (tctx->was_in_whitelisted_code) {
-            tctx->was_in_whitelisted_code = false;
-            procCtx->addBbOutOfWhitelisted(tctx->os_tid, tctx->pin_tid);
-        }
+        TRACE_InsertCall(trace, IPOINT_BEFORE, (AFUNPTR)TraceExitedWhitelisted, 
+            IARG_PTR, procCtx,
+            IARG_END);
         return;
     }
-    tctx->was_in_whitelisted_code = true;
+    TRACE_InsertCall(trace, IPOINT_BEFORE, (AFUNPTR)TraceEnteredWhitelistedCode, 
+        IARG_PTR, procCtx,
+        IARG_END);
 
     for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {
 
