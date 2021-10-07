@@ -2,6 +2,10 @@
 :: E.g. run 0 notepad.exe test.txt
 :: E.g. run 10 a-32.exe
 
+:: Create folders
+if not exist gen mkdir gen
+if not exist web\gen mkdir web\gen
+
 :: Delete previous runs
 del gen\pin.* /f /q
 del gen\Este-out\* /f /q
