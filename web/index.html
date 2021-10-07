@@ -1,0 +1,26 @@
+<head>
+  <style> body { margin: 0; } </style>
+
+  <script src="//unpkg.com/3d-force-graph"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!--  <script src="../../dist/3d-force-graph.js"></script>-->
+</head>
+
+<body>
+
+  <div id="3d-graph"></div>
+
+  <script>
+    const elem = document.getElementById('3d-graph');
+
+    $.getJSON( "gen/pids.json", function( pids ) {
+
+      // For now just display the first pid...
+      let pid = pids[0];
+      const Graph = ForceGraph3D()(elem)
+        .jsonUrl("gen/pid_" + pid.toString() + '_este.json');
+
+    });
+
+  </script>
+</body>

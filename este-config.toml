@@ -4,11 +4,11 @@ title = "Este Dynamic Analysis Config"
 [OUTPUT]
 
 # output-dir @type str:
-#    Directory where Este will dump logs and the taintdatabase to.
-output-dir = "Este-out"
+#    Directory where Este will dump logs and trace data to.
+output-dir = "gen/Este-out"
 
 [ANALYSIS-SCOPE]
 
 # binary-whitelist @type List[str]:
 #    Este will analyse only binaries in this list
-binary-whitelist = ["a-32.exe"]
+binary-whitelist = ["notepad.exe", "helloworld.exe"]
