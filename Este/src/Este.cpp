@@ -5,13 +5,20 @@
 #include "Este\instruments.hpp"
 #include "Este\serial.hpp"
 
-int Usage() {
-    std::cout << "Umm what happened?" << std::endl;
+int Usage(char* argv[]) {
+    std::cout << 
+        "\nUsage:\n" << 
+        "    pin.exe <pin knobs> -config-file <config filepath> -- <target program and arguments>\n"
+        "        @param config-file: Este config file. See `este-config.toml` for more details\n"
+        << std::endl;
     return 1;
 }
 
 int main(int argc, char* argv[])
 {
+    // Initialise PIN
+    if (PIN_Init(argc, argv)) return Usage(argv);
+
     // Initialise knobs
     Knobs::Init();
 
@@ -22,9 +29,6 @@ int main(int argc, char* argv[])
         Knobs::getOutputPrefix() + ".rtn.csv", // routines
         Knobs::getOutputPrefix() + ".trace.csv" // execution trace
     );
-
-    // Initialise PIN
-    if (PIN_Init(argc, argv)) return Usage();
 
     // Registers callbacks
     Instrument::Init_callbacks();

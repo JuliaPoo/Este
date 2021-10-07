@@ -8,3 +8,5 @@ postprocessing/.DS_Store
 postprocessing/__pycache__*
 
 web/gen/*
+
+pintool.log
