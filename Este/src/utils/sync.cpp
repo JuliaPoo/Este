@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+// Uncomment to debug deadlocks for potential (owner-did-not-release cases)
+// #define DEBUG_SYNC
+
 using namespace Sync;
 
 TimedMutex::TimedMutex(uint timeout)
@@ -92,10 +95,14 @@ TOKEN RW::_writer_aquire(void)
 	if (!this->mutex_rsrc.lock())
 		RAISE_EXCEPTION("Failed to lock mutex_rsrc in `%s:%p`", this->toStr().c_str(), this);
 
+#ifdef DEBUG_SYNC
 	auto ret = rand() | 1;
 	this->wowner = ret;
 
 	return ret;
+#else
+	return 1;
+#endif
 }
 
 TOKEN RW::_reader_aquire(void)
@@ -104,19 +111,28 @@ TOKEN RW::_reader_aquire(void)
 		RAISE_EXCEPTION("Failed to lock mutex_read in `%s:%p`", this->toStr().c_str(), this);
 
 	this->_read_count++;
+
+#ifdef DEBUG_SYNC
 	TOKEN tok = rand() | 1;
 	this->rowner.insert(tok);
+#endif
+
 	if (_read_count == 1)
 		if (!this->mutex_rsrc.lock())
 			RAISE_EXCEPTION("Failed to lock mutex_rsrc in `%s:%p`", this->toStr().c_str(), this);
 
 	this->mutex_read.unlock();
+
+#ifdef DEBUG_SYNC
 	return tok;
+#else
+	return 1;
+#endif
 }
 
 bool RW::_writer_release(TOKEN owner)
 {
-
+#ifdef DEBUG_SYNC
 	if (!this->wowner) {
 		RAISE_EXCEPTION("No writer owner to `%s` to release!", this->toStr().c_str());
 	}
@@ -124,6 +140,7 @@ bool RW::_writer_release(TOKEN owner)
 		RAISE_EXCEPTION("Attempted to release invalid writer owner to `%s`", this->toStr().c_str());
 	}
 	this->wowner = 0;
+#endif
 
 	this->mutex_rsrc.unlock();
 	return true;
@@ -134,6 +151,7 @@ bool RW::_reader_release(TOKEN owner)
 	if (!this->mutex_read.lock())
 		RAISE_EXCEPTION("Failed to lock mutex_read in `%s:%p`", this->toStr().c_str(), this);
 
+#ifdef DEBUG_SYNC
 	if (!this->rowner.size()) {
 		RAISE_EXCEPTION("No reader owner to `%s` to release!", this->toStr().c_str());
 	}
@@ -142,6 +160,8 @@ bool RW::_reader_release(TOKEN owner)
 		RAISE_EXCEPTION("Attempted to release invalid reader owner to `%s`", this->toStr().c_str());
 	}
 	this->rowner.erase(it);
+#endif
+
 	this->_read_count--;
 	if (_read_count == 0)
 		this->mutex_rsrc.unlock();
