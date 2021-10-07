@@ -42,6 +42,7 @@
     <ClInclude Include="src\include\Este\rtn.hpp" />
     <ClInclude Include="src\include\Este\serial.hpp" />
     <ClInclude Include="src\include\Este\sync.hpp" />
+    <ClInclude Include="src\include\Este\thread.hpp" />
     <ClInclude Include="src\include\Este\utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -95,5 +95,8 @@
     <ClInclude Include="src\include\Este\rtn.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\include\Este\thread.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

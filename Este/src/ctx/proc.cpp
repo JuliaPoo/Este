@@ -4,6 +4,7 @@
 #include "Este\rtn.hpp"
 #include "Este\bb.hpp"
 #include "Este\errors.hpp"
+#include "Este\utils.hpp"
 
 using namespace Ctx;
 
@@ -48,6 +49,16 @@ Proc::~Proc()
 	Serial::getBbSerial().flush();
 	Serial::getRtnSerial().flush();
 	Serial::getTraceSerial().flush();
+}
+
+void* Proc::operator new(size_t i)
+{
+	return EsteUtils::aligned_malloc(i, 64);
+}
+
+void Proc::operator delete(void* p)
+{
+	EsteUtils::aligned_free(p);
 }
 
 void Proc::addImage(const Ctx::Image& img)
@@ -107,6 +118,17 @@ void Proc::addBbExecuted(const Ctx::BbExecuted& bbe)
 	this->_serial_trace_lock.writer_release(w);
 }
 
+void Proc::addBbOutOfWhitelisted(const OS_THREAD_ID os_tid, const THREADID pin_tid)
+{
+	// Serialize the event 
+	// "bb_idx,os_tid,pin_tid,rtn_called_idx";
+	std::stringstream entry;
+	entry << "-1," << std::dec << os_tid << "," << std::dec << pin_tid << ",-1\n";
+	auto w = this->_serial_trace_lock.writer_aquire();
+	Serial::getTraceSerial() << entry.str();
+	this->_serial_trace_lock.writer_release(w);
+}
+
 const Rtn* Proc::getRtn(ADDRINT addr) const
 {
 	auto r = const_cast<Proc*>(this)->_rtns_lock.reader_aquire();
@@ -145,7 +167,7 @@ const Image* Proc::getImageExecutable(ADDRINT addr) const
 const int32_t Proc::getNumImages() const
 {
 	auto r = const_cast<Proc*>(this)->_images_lock.reader_aquire();
-	int32_t ret = this->images.size();
+	int32_t ret = static_cast<decltype(ret)>(this->images.size());
 	const_cast<Proc*>(this)->_images_lock.reader_release(r);
 	return ret;
 }
@@ -153,7 +175,7 @@ const int32_t Proc::getNumImages() const
 const int32_t Proc::getNumRtn() const
 {
 	auto r = const_cast<Proc*>(this)->_rtns_lock.reader_aquire();
-	int32_t ret = this->rtns.size();
+	int32_t ret = static_cast<decltype(ret)>(this->rtns.size());
 	const_cast<Proc*>(this)->_rtns_lock.reader_release(r);
 	return ret;
 }
@@ -161,7 +183,7 @@ const int32_t Proc::getNumRtn() const
 const int32_t Proc::getNumBb() const
 {
 	auto r = const_cast<Proc*>(this)->_bbs_lock.reader_aquire();
-	int32_t ret = this->bbs.size();
+	int32_t ret = static_cast<decltype(ret)>(this->bbs.size());
 	const_cast<Proc*>(this)->_bbs_lock.reader_release(r);
 	return ret;
 }

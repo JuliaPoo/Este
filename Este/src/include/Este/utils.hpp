@@ -5,6 +5,12 @@
 
 namespace EsteUtils {
 
+	// Allocate memory of size `required_bytes` with alignment `alignment`
+	void* aligned_malloc(size_t required_bytes, size_t alignment);
+
+	// Free memory allocated via aligned_malloc
+	void aligned_free(void* p);
+
 	// Checks if string contains suffix
 	bool hasSuffix(const std::string& str, const std::string& suffix);
 

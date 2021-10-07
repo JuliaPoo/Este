@@ -3,6 +3,25 @@
 #include <algorithm>
 #include <cctype>
 
+void* EsteUtils::aligned_malloc(size_t required_bytes, size_t alignment)
+{
+    void* p1; // original block
+    void** p2; // aligned block
+    size_t offset = alignment - 1 + sizeof(void*);
+    if ((p1 = (void*)malloc(required_bytes + offset)) == NULL)
+    {
+        return NULL;
+    }
+    p2 = (void**)(((size_t)(p1)+offset) & ~(alignment - 1));
+    p2[-1] = p1;
+    return p2;
+}
+
+void EsteUtils::aligned_free(void* p)
+{
+    free(((void**)p)[-1]);
+}
+
 bool EsteUtils::hasSuffix(const std::string& str, const std::string& suffix)
 {
     if (str.length() >= suffix.length())

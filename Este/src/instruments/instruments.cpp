@@ -1,6 +1,7 @@
 #include "Este\instruments.hpp"
 #include "Este\errors.hpp"
 #include "Este\proc.hpp"
+#include "Este\thread.hpp"
 #include "Este\image.hpp"
 #include "Este\bb.hpp"
 #include "Este\rtn.hpp"
@@ -8,6 +9,8 @@
 #include <pin.H>
 
 using namespace Instrument;
+
+static TLS_KEY tls_key = 0xcccccccc;
 
 VOID PrepareForFiniFunctionFini(Ctx::Proc* procCtx)
 {
@@ -21,6 +24,22 @@ VOID Fini(INT32 code, Ctx::Proc* procCtx)
     LOGGING("Process terminated with code %d", code);
 }
 
+VOID ThreadStart(THREADID pin_tid, CONTEXT* ctxt, INT32 flags, Ctx::Proc* procCtx)
+{
+    OS_THREAD_ID os_tid; OS_GetTid(&os_tid);
+    LOGGING("Thread started! %d:%d", pin_tid, os_tid);
+
+    auto tctx = new Ctx::Thread();
+    tctx->os_tid = os_tid;
+    tctx->pin_tid = pin_tid;
+    PIN_SetThreadData(tls_key, tctx, pin_tid);
+}
+
+VOID ThreadFini(THREADID pin_tid, const CONTEXT* ctxt, INT32 code, Ctx::Proc* procCtx)
+{
+    OS_THREAD_ID os_tid; OS_GetTid(&os_tid);
+    LOGGING("Thread finished! %d:%d", pin_tid, os_tid);
+}
 
 VOID ImageLoad(IMG img, Ctx::Proc* procCtx)
 {
@@ -74,11 +93,19 @@ VOID BblAft(const CONTEXT* pinctx, ADDRINT instptr, ADDRINT bbl_addr, THREADID t
 VOID Trace(TRACE trace, Ctx::Proc* procCtx)
 {
     auto taddr = TRACE_Address(trace);
+    Ctx::Thread* tctx = reinterpret_cast<decltype(tctx)>(
+        PIN_GetThreadData(tls_key, PIN_ThreadId()));
 
     // Check if trace is within whitelisted binaries
     auto img = procCtx->getImageExecutable(taddr);
-    if (!(img == NULL || img->isWhitelisted()))
+    if (!(img == NULL || img->isWhitelisted())) {
+        if (tctx->was_in_whitelisted_code) {
+            tctx->was_in_whitelisted_code = false;
+            procCtx->addBbOutOfWhitelisted(tctx->os_tid, tctx->pin_tid);
+        }
         return;
+    }
+    tctx->was_in_whitelisted_code = true;
 
     for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {
 
@@ -110,6 +137,9 @@ VOID Rtn(RTN rtn, Ctx::Proc* procCtx)
 
 void Instrument::Init_callbacks()
 {
+    // Initialize TLS key
+    tls_key = PIN_CreateThreadDataKey(NULL);
+
     auto procCtx = new Ctx::Proc();
     LOGGING("Proc created!");
 
@@ -119,6 +149,10 @@ void Instrument::Init_callbacks()
     // Process finish instrumentation
     PIN_AddPrepareForFiniFunction((PREPARE_FOR_FINI_CALLBACK)PrepareForFiniFunctionFini, procCtx);
     PIN_AddFiniFunction((FINI_CALLBACK)Fini, procCtx);
+
+    // Thread Start and Finish instrumentation
+    PIN_AddThreadStartFunction((THREAD_START_CALLBACK)ThreadStart, procCtx);
+    PIN_AddThreadFiniFunction((THREAD_FINI_CALLBACK)ThreadFini, procCtx);
 
     // Basic Blocks
     TRACE_AddInstrumentFunction((TRACE_INSTRUMENT_CALLBACK)Trace, procCtx);

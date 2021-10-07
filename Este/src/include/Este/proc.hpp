@@ -21,8 +21,11 @@ namespace Ctx {
 
 		~Proc();
 
-		// Serializer
-		// std::ostream& operator<<(std::ostream& out) const;
+		// Overwrite operator new to ensure 64-byte alignment
+		void* operator new(size_t i);
+
+		// Overwrite operator delete to ensure 64-byte alignment
+		void operator delete(void* p);
 
 		// Adds image to this->images and serializes it into serial::db (.este.json)
 		void addImage(const Ctx::Image& img);
@@ -37,6 +40,10 @@ namespace Ctx {
 
 		// Serializes BbExecuted into serial::trace (.trace.csv)
 		void addBbExecuted(const Ctx::BbExecuted& bbe);
+
+		// Serializes the event whereby a thread jumps out of whitelisted code
+		// into serial::trace (.trace.csv). Represented as an empty entry except tid
+		void addBbOutOfWhitelisted(const OS_THREAD_ID os_tid, const THREADID pin_tid);
 
 		// Get routine that starts at addr. Returns NULL if not found.
 		const Rtn* getRtn(ADDRINT addr) const;
