@@ -1,0 +1,10 @@
+gen/*
+
+Este/build
+Este/*vcxproj.user
+Este/.vs
+
+postprocessing/.DS_Store
+postprocessing/__pycache__*
+
+web/gen/*
