@@ -13,14 +13,28 @@
   <script>
     const elem = document.getElementById('3d-graph');
 
-    $.getJSON( "gen/pids.json", function( pids ) {
+    $.getJSON( "gen/pid_tid_map.json", function( pids_tid_map ) {
+      
+      for (let pid in pids_tid_map) {
+        for (let tid of pids_tid_map[pid]) {
 
-      // For now just display the first pid...
-      let pid = pids[0];
-      const Graph = ForceGraph3D()(elem)
-        .jsonUrl("gen/pid_" + pid.toString() + '_este.json');
+          let pin_tid = tid["pin_tid"]
+          let os_tid = tid["os_tid"]
 
-    });
+          const Graph = ForceGraph3D()(elem)
+            .jsonUrl(
+              "gen/pid" + pid.toString() +
+              "_tid" + os_tid.toString() +
+              "_ptid" + pin_tid.toString() +
+              ".json")
+            .linkDirectionalArrowLength(10)
+            .linkDirectionalArrowRelPos(1)
+
+          return; // For now just plot the 1st thread of the 1st process
+        }
+      }
+
+    })
 
   </script>
 </body>

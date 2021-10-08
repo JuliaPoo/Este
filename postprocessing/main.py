@@ -1,4 +1,4 @@
-from format_helper import DataParser
+from format_helper import ParsedProcess
 import os
 import json
 import pathlib
@@ -19,12 +19,30 @@ def getPids() -> list:
 def main():
 
     all_pids = getPids()
-    with open(OUT_DIR / "pids.json", "w") as f:
-        json.dump(all_pids, f)
-
+    
+    pid_tid_map = {}
     for pid in all_pids:
-        db = DataParser(IN_DIR, pid)
-        db.outputToJson(OUT_DIR / f"pid_{pid}_este.json")
+
+        proc = ParsedProcess(IN_DIR, pid)
+        all_tids = []
+        for thread in proc.threads:
+
+            ptid = thread.pin_tid
+            otid = thread.os_tid
+            all_tids.append({
+                "pin_tid": ptid,
+                "os_tid": otid
+            })
+
+            thread.outputToJson(
+                proc, OUT_DIR / f"pid{pid}_tid{otid}_ptid{ptid}.json"
+            )
+
+        pid_tid_map[pid] = all_tids
+
+    with open(OUT_DIR / "pid_tid_map.json", 'w') as f:
+        json.dump(pid_tid_map, f)
+    
 
 if __name__ == "__main__":
     main()
