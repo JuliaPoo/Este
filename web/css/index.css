@@ -1,0 +1,16 @@
+*{
+    font-family:consolas;
+    color: white;
+}
+
+body {
+    background-color:black;
+}
+
+#pid-selection {
+    background-color: black;
+}
+
+#tid-selection {
+    background-color: black;
+}

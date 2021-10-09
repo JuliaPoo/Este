@@ -3,59 +3,113 @@
 
   <script src="//unpkg.com/3d-force-graph"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="css/index.css">
+
 </head>
 
 <body>
 
-  <div id="3d-graph"></div>
+<form id="pid-tid-selection">
+  <label for="pid">PID to analyse:</label>
+  <select id="pid-selection" name="pid">
+    <option value="none">None</option>
+  </select>
+  <label for="tid">TID to analyse:</label>
+  <select id="tid-selection" name="tid" disabled>
+    <option value="none">None</option>
+  </select>
+</form>
+
+<div id="3d-graph"></div>
 
 <script type="module">
 
 import { GUI } from 'https://threejs.org/examples/jsm/libs/dat.gui.module.js';
-import * as THREE from 'https://threejs.org/build/three.module.js';
+
+let pids_tid_map;
+let pid_select = document.getElementById("pid-selection");
+let tid_select = document.getElementById("tid-selection");
+
+$.getJSON( "gen/pid_tid_map.json", function( data ) {
+  pids_tid_map = data;
+  for (let pid in data) {
+    let option_str = pid.toString();
+    let pid_option = document.createElement("option");
+    pid_option.setAttribute("value", option_str);
+    pid_option.textContent += option_str;
+    pid_select.appendChild(pid_option);
+  }
+})
+
+pid_select.addEventListener("change", function() {
+    let pid = pid_select.value;
+
+    if (pid === "none") {
+      tid_select.setAttribute("disabled", true);
+      tid_select.value = "none"
+      return;
+    }
+
+    let tids = pids_tid_map[pid];
+    for (let tid of tids) {
+      let option_str = tid.pin_tid.toString() + ": " + tid.os_tid.toString()
+      let tid_option = document.createElement("option");
+      tid_option.setAttribute("value", tid.pin_tid.toString());
+      tid_option.textContent += option_str;
+      tid_select.appendChild(tid_option);
+    }
+    tid_select.removeAttribute('disabled');
+});
 
 const params = {
   linkOpacity: 0.6,
   frequencySensitivity: 0.7
 };
 
-const elem = document.getElementById('3d-graph');
-var Graph;
+function createGraph(elem, filename)
+{
+  return ForceGraph3D()(elem)
+    .jsonUrl(filename)
+    .linkDirectionalArrowLength(10)
+    .linkDirectionalArrowRelPos(0.5)
+    .enableNodeDrag(false)
+    .linkWidth(link => 1/params.frequencySensitivity * Math.log(link.count) + 1)
+    .linkOpacity(params.linkOpacity);
+}
 
-$.getJSON( "gen/pid_tid_map.json", function( pids_tid_map ) {
-  
-  for (let pid in pids_tid_map) {
-    for (let tid of pids_tid_map[pid]) {
+var graph;
+tid_select.addEventListener("change", function() {
 
-      let pin_tid = tid["pin_tid"]
-      let os_tid = tid["os_tid"]
+  if (tid_select.value == "none") {
+    return;
+  }
 
-      Graph = ForceGraph3D()(elem)
-        .jsonUrl(
-          "gen/pid" + pid.toString() +
-          "_tid" + os_tid.toString() +
-          "_ptid" + pin_tid.toString() +
-          ".json")
-        .linkDirectionalArrowLength(link => 10)
-        .linkDirectionalArrowRelPos(0.5)
-        .enableNodeDrag(false)
-        .linkWidth(link => 1/params.frequencySensitivity * Math.log(link.count) + 1)
-        .linkOpacity(params.linkOpacity)
-
-      return; // For now just plot the 1st thread of the 1st process
+  let pid = pid_select.value;
+  let pin_tid = tid_select.value;
+  let os_tid;
+  for (let tid of pids_tid_map[pid]) {
+    if (tid.pin_tid == pin_tid) {
+      os_tid = tid.os_tid;
+      break;
     }
   }
+  
+  let elem = document.getElementById('3d-graph');
+  let filename = "gen/pid" + pid.toString() +
+    "_tid" + os_tid.toString() +
+    "_ptid" + pin_tid.toString() +
+    ".json";
+
+  graph = createGraph(elem, filename);
 })
 
 const gui = new GUI();
 gui.add(params, "linkOpacity", 0.0, 1.0).onChange(
-  val => Graph.linkOpacity(Number(val)));
+  val => graph.linkOpacity(Number(val)));
 gui.add(params, "frequencySensitivity", 0.0, 1.0).onChange(
-  val => Graph.linkWidth(link => 1/Number(val) * Math.log(link.count) + 1))
+  val => graph.linkWidth(link => 1/Number(val) * Math.log(link.count) + 1))
 gui.close();
 
-
-
 </script>
-
 </body>
