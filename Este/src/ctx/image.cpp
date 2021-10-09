@@ -41,7 +41,7 @@ std::string Image::toStr()
 		<< " [" << STREAM_POINTER_FORMAT << this->addr_range.first << "-" 
 		<< STREAM_POINTER_FORMAT << this->addr_range.second << "]" // addr range
 		<< " [ Executable: ";
-	for (auto r : this->addr_range_executable) // executable addr ranges
+	for (auto& r : this->addr_range_executable) // executable addr ranges
 		ret << STREAM_POINTER_FORMAT << r.first << "-" 
 			<< STREAM_POINTER_FORMAT << r.second << ",";
 	ret << "]";
@@ -57,7 +57,7 @@ std::ostream& Ctx::operator<<(std::ostream& out, const Image& i)
 		<< "\"addr_range_executable\":[";
 
 	uint8_t is_first = 0;
-	for (auto r : i.addr_range_executable) {
+	for (auto& r : i.addr_range_executable) {
 		out << (is_first++==0 ? "[" : ",[");
 		out << r.first << "," << r.second << "]";
 	}

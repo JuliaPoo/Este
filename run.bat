@@ -12,8 +12,8 @@ del gen\Este-out\* /f /q
 del web\gen\* /f /q
 
 :: Copy Este dlls into gen folder
-cp Este\build\Release-x64\Este.dll gen\Este-64.dll
-cp Este\build\Release-Win32\Este.dll gen\Este-32.dll
+copy Este\build\Release-x64\Este.dll gen\Este-64.dll
+copy Este\build\Release-Win32\Este.dll gen\Este-32.dll
 
 :: Perform analysis on target
 for /f "tokens=1,* delims= " %%a in ("%*") do set RUN_COMMAND=%%b

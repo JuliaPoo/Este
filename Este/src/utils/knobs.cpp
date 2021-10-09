@@ -108,7 +108,7 @@ void parse_config_file(const std::string configfile)
     _parse_analysis_scope_table(conf);
 
     std::stringstream _taint_whitelist_str;
-    for (auto i : whitelist_binaries)
+    for (auto& i : whitelist_binaries)
         _taint_whitelist_str << "`" << i << "`" << " ";
 
     LOGGING("[CONFIG] Final config: output-dir = %s", output_dir.c_str());
@@ -149,7 +149,7 @@ bool Knobs::isBinaryWhitelisted(std::string path)
         RAISE_EXCEPTION("Knobs not initialised before calling `isBinaryWhitelisted`! Call Knobs::Init()");
 
     path = EsteUtils::toLower(path);
-    for (auto p : whitelist_binaries)
+    for (auto& p : whitelist_binaries)
         if (EsteUtils::hasSuffix(path, EsteUtils::toLower(p)))
             return true;
 

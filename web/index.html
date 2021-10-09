@@ -3,38 +3,59 @@
 
   <script src="//unpkg.com/3d-force-graph"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<!--  <script src="../../dist/3d-force-graph.js"></script>-->
 </head>
 
 <body>
 
   <div id="3d-graph"></div>
 
-  <script>
-    const elem = document.getElementById('3d-graph');
+<script type="module">
 
-    $.getJSON( "gen/pid_tid_map.json", function( pids_tid_map ) {
-      
-      for (let pid in pids_tid_map) {
-        for (let tid of pids_tid_map[pid]) {
+import { GUI } from 'https://threejs.org/examples/jsm/libs/dat.gui.module.js';
+import * as THREE from 'https://threejs.org/build/three.module.js';
 
-          let pin_tid = tid["pin_tid"]
-          let os_tid = tid["os_tid"]
+const params = {
+  linkOpacity: 0.6,
+  frequencySensitivity: 0.7
+};
 
-          const Graph = ForceGraph3D()(elem)
-            .jsonUrl(
-              "gen/pid" + pid.toString() +
-              "_tid" + os_tid.toString() +
-              "_ptid" + pin_tid.toString() +
-              ".json")
-            .linkDirectionalArrowLength(10)
-            .linkDirectionalArrowRelPos(1)
+const elem = document.getElementById('3d-graph');
+var Graph;
 
-          return; // For now just plot the 1st thread of the 1st process
-        }
-      }
+$.getJSON( "gen/pid_tid_map.json", function( pids_tid_map ) {
+  
+  for (let pid in pids_tid_map) {
+    for (let tid of pids_tid_map[pid]) {
 
-    })
+      let pin_tid = tid["pin_tid"]
+      let os_tid = tid["os_tid"]
 
-  </script>
+      Graph = ForceGraph3D()(elem)
+        .jsonUrl(
+          "gen/pid" + pid.toString() +
+          "_tid" + os_tid.toString() +
+          "_ptid" + pin_tid.toString() +
+          ".json")
+        .linkDirectionalArrowLength(link => 10)
+        .linkDirectionalArrowRelPos(0.5)
+        .enableNodeDrag(false)
+        .linkWidth(link => 1/params.frequencySensitivity * Math.log(link.count) + 1)
+        .linkOpacity(params.linkOpacity)
+
+      return; // For now just plot the 1st thread of the 1st process
+    }
+  }
+})
+
+const gui = new GUI();
+gui.add(params, "linkOpacity", 0.0, 1.0).onChange(
+  val => Graph.linkOpacity(Number(val)));
+gui.add(params, "frequencySensitivity", 0.0, 1.0).onChange(
+  val => Graph.linkWidth(link => 1/Number(val) * Math.log(link.count) + 1))
+gui.close();
+
+
+
+</script>
+
 </body>
