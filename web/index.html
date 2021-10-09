@@ -51,6 +51,9 @@ pid_select.addEventListener("change", function() {
       return;
     }
 
+    while (tid_select.childElementCount != 1) {
+      tid_select.removeChild(tid_select.lastChild);
+    }
     let tids = pids_tid_map[pid];
     for (let tid of tids) {
       let option_str = tid.pin_tid.toString() + ": " + tid.os_tid.toString()
