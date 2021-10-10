@@ -35,7 +35,7 @@ def main():
             })
 
             thread.outputToJson(
-                proc, OUT_DIR / f"pid{pid}_tid{otid}_ptid{ptid}.json"
+                OUT_DIR / f"pid{pid}_tid{otid}_ptid{ptid}.json"
             )
 
         pid_tid_map[pid] = all_tids

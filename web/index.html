@@ -72,13 +72,15 @@ const params = {
 
 function createGraph(elem, filename)
 {
-  return ForceGraph3D()(elem)
+  let graph = ForceGraph3D()(elem)
     .jsonUrl(filename)
     .linkDirectionalArrowLength(10)
     .linkDirectionalArrowRelPos(0.5)
     .enableNodeDrag(false)
     .linkWidth(link => 1/params.frequencySensitivity * Math.log(link.count) + 1)
     .linkOpacity(params.linkOpacity);
+
+  graph.controls().dynamicDampingFactor = 0.8; // Make controls crisp
 }
 
 var graph;

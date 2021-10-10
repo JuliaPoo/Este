@@ -7,8 +7,9 @@ from typing import List
 
 class ParsedThread():
 
-    def __init__(self, os_tid:int, pin_tid:int, trace:List[dict]):
+    def __init__(self, os_tid:int, pin_tid:int, trace:List[dict], nodes:List[dict]):
 
+        self.nodes:List[dict] = nodes
         self.pin_tid:int = pin_tid
         self.os_tid:int = os_tid
         self._full_trace:List[dict] = trace
@@ -72,8 +73,8 @@ class ParsedThread():
 
         return unique_links
 
-    def outputToJson(self, proc:"ParsedProcess", filename:str):
-        data = {"nodes": proc.nodes, "links": self.links}
+    def outputToJson(self, filename:str):
+        data = {"nodes": self.nodes, "links": self.links}
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f)
 
@@ -94,7 +95,7 @@ class ParsedProcess():
 
         # Split trace into different threads
         self.threads:List[ParsedThread] = self._splitTraceToThreads(
-            self._process_trace)
+            self._process_trace, self.nodes)
 
     @staticmethod
     def _loadBB(bb_filename:str) -> List[dict]:
@@ -124,7 +125,7 @@ class ParsedProcess():
         return trace
 
     @staticmethod
-    def _splitTraceToThreads(trace:List[dict]) -> List[ParsedThread]:
+    def _splitTraceToThreads(trace:List[dict], nodes:List[dict]) -> List[ParsedThread]:
 
         """Splits trace into threads"""
 
@@ -137,13 +138,11 @@ class ParsedProcess():
         for os_tid, pin_tid in all_tid:
             # Get trace for pid
             thread_trace = [bb for bb in trace if int(bb["pin_tid"]) == pin_tid]
+            thread_nodes = [nodes[idx] for idx in set(int(bb['bb_idx']) for bb in thread_trace)]
             threads.append(
-                ParsedThread(os_tid, pin_tid, thread_trace))
+                ParsedThread(os_tid, pin_tid, thread_trace, thread_nodes))
 
         return threads
     
     def nodesToStr(self) -> str:
         return json.dumps(self.nodes, indent = 4, sort_keys=True)
-
-    def linksToStr(self) -> str:
-        return json.dumps(self.trace, indent = 4, sort_keys=True)
