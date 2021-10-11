@@ -19,6 +19,8 @@ class ParsedThread():
         self._split_trace:List[List[dict]] = self._splitTrace(
             self._full_trace)
 
+        print(self._split_trace)
+
         # Convert split trace into links
         # for use in plotting
         self.links: List[dict] = self._splitTraceToLinks(
@@ -49,17 +51,29 @@ class ParsedThread():
         """Converts split trace into links"""
 
         links = list()
-        for trace in split_trace:
+        end_trace = len(split_trace)-1
+        for trace_id,trace in enumerate(split_trace):
 
             end_idx = len(trace)-1
             for idx,bb in enumerate(trace):
 
-                if idx == 0 or idx == end_idx:
+                print(idx, bb)
+
+                if idx == end_idx:
                     continue
 
                 edge = {}
                 edge['target'] = trace[idx+1]['bb_idx']
                 edge['source'] = bb['bb_idx']
+                
+                links.append(tuple(edge.items()))
+
+            # Adds the link between split traces
+            if trace_id != end_trace:
+                edge = {}
+                edge['target'] = split_trace[trace_id+1][0]['bb_idx']
+                edge['source'] = trace[-1]['bb_idx']
+                edge['non_white'] = 1
                 
                 links.append(tuple(edge.items()))
 
