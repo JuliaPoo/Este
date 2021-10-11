@@ -7,7 +7,7 @@ from typing import List
 
 class ParsedThread():
 
-    def __init__(self, os_tid:int, pin_tid:int, trace:List[dict], nodes:List[dict]):
+    def __init__(self, os_tid:int, pin_tid:int, trace:List[dict], nodes:List[dict], routines:List[dict]):
 
         self.nodes:List[dict] = nodes
         self.pin_tid:int = pin_tid
@@ -22,7 +22,7 @@ class ParsedThread():
         # Convert split trace into links
         # for use in plotting
         self.links: List[dict] = self._splitTraceToLinks(
-            self._split_trace)
+            self._split_trace, routines)
 
     @staticmethod
     def _splitTrace(trace:List[dict]) -> List[List[dict]]:
@@ -44,7 +44,7 @@ class ParsedThread():
         return split_trace
 
     @staticmethod
-    def _splitTraceToLinks(split_trace:List[List[dict]]) -> List[dict]:
+    def _splitTraceToLinks(split_trace:List[List[dict]], routines:List[dict]) -> List[dict]:
 
         """Converts split trace into links"""
 
@@ -70,6 +70,13 @@ class ParsedThread():
                 edge['target'] = split_trace[trace_id+1][0]['bb_idx']
                 edge['source'] = trace[-1]['bb_idx']
                 edge['non_white'] = 1
+                
+                # Add routine label
+                rtn_idx = int(trace[-1]['rtn_called_idx'])
+                if rtn_idx > 0:
+                    edge['rtn_called'] = routines[rtn_idx]['rtn_name']
+                else:
+                    edge['rtn_called'] = "None"
                 
                 links.append(tuple(edge.items()))
 
@@ -104,12 +111,12 @@ class ParsedProcess():
             self.directory / f"pid{self.pid}.trace.csv")
 
         # Loads all routines
-        self._loadRtn(
+        self.routines:List[dict] = self._loadRtn(
             self.directory / f"pid{self.pid}.rtn.csv")
 
         # Split trace into different threads
         self.threads:List[ParsedThread] = self._splitTraceToThreads(
-            self._process_trace, self.nodes)
+            self._process_trace, self.nodes, self.routines)
 
     @staticmethod
     def _loadBB(bb_filename:str) -> List[dict]:
@@ -140,7 +147,7 @@ class ParsedProcess():
 
     def _loadRtn(self, rtn_filename:str):
 
-        """Loads routines into self.nodes"""
+        """Loads routines into a dictionary"""
 
         routines = list()
         with open(rtn_filename) as f:
@@ -149,14 +156,10 @@ class ParsedProcess():
             for row in reader:
                 routines.append(dict(zip(headers, row)))
 
-        for trace in self._process_trace:
-            rtn_called_idx = int(trace["rtn_called_idx"])
-            bb_idx = int(trace["bb_idx"])
-            if rtn_called_idx != -1 and rtn_called_idx != 0:
-                self.nodes[bb_idx]["rtn_called"] = routines[int(rtn_called_idx)]["rtn_name"]
+        return routines
 
     @staticmethod
-    def _splitTraceToThreads(trace:List[dict], nodes:List[dict]) -> List[ParsedThread]:
+    def _splitTraceToThreads(trace:List[dict], nodes:List[dict], routines:List[dict]) -> List[ParsedThread]:
 
         """Splits trace into threads"""
 
@@ -171,7 +174,7 @@ class ParsedProcess():
             thread_trace = [bb for bb in trace if int(bb["pin_tid"]) == pin_tid]
             thread_nodes = [nodes[idx] for idx in set(int(bb['bb_idx']) for bb in thread_trace)]
             threads.append(
-                ParsedThread(os_tid, pin_tid, thread_trace, thread_nodes))
+                ParsedThread(os_tid, pin_tid, thread_trace, thread_nodes, routines))
 
         return threads
     
