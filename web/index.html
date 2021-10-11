@@ -101,6 +101,29 @@ pid_select.addEventListener("change", function() {
     tid_select.removeAttribute('disabled');
 });
 
+const params = {
+  linkOpacity: 0.6,
+  frequencySensitivity: 0.7
+};
+
+function createGraph(elem, filename)
+{
+  let colour_link = "green"; // Color of the links that denote access to non-whitelisted areas
+  let graph = ForceGraph3D()(elem)
+    .jsonUrl(filename)
+    .linkDirectionalArrowLength(10)
+    .linkDirectionalArrowRelPos(0.5)
+    .enableNodeDrag(false)
+    .linkWidth(link => 1/params.frequencySensitivity * Math.log(link.count) + 1)
+    .linkOpacity(params.linkOpacity)
+    .linkCurvature(link => (link.target == link.source) ? 1 : 0)
+    .linkColor(link => (link.hasOwnProperty('non_white')) ? colour_link : 0)
+    .nodeLabel(node => node.rtn_called);
+
+  graph.controls().dynamicDampingFactor = 0.8; // Make controls crisp
+  return graph;
+}
+
 var graph;
 tid_select.addEventListener("change", function() {
 
