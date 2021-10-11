@@ -74,7 +74,7 @@ const params = {
   linkOpacity: 0.6,
   frequencySensitivity: 0.7
 };
-var s;
+
 function createGraph(elem, filename)
 {
   var W = elem.clientWidth;
@@ -100,7 +100,6 @@ function createGraph(elem, filename)
       return sprite;
     })
     .linkPositionUpdate((sprite, { start, end }) => {
-      s = sprite
       const middlePos = Object.assign(...['x', 'y', 'z'].map(c => ({
         [c]: start[c] + (end[c] - start[c]) / 2 // calc middle point
       })));
