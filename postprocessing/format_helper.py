@@ -19,8 +19,6 @@ class ParsedThread():
         self._split_trace:List[List[dict]] = self._splitTrace(
             self._full_trace)
 
-        print(self._split_trace)
-
         # Convert split trace into links
         # for use in plotting
         self.links: List[dict] = self._splitTraceToLinks(
@@ -56,8 +54,6 @@ class ParsedThread():
 
             end_idx = len(trace)-1
             for idx,bb in enumerate(trace):
-
-                print(idx, bb)
 
                 if idx == end_idx:
                     continue
