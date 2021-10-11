@@ -1,10 +1,20 @@
-*{
+* {
     font-family:consolas;
     color: white;
 }
 
+html, body { /* Disable scrolling */
+    margin: 0; 
+    height: 100%; 
+    overflow: hidden
+}
+
 body {
     background-color:black;
+}
+
+#pid-tid-selection {
+    display: inline-block;
 }
 
 #pid-selection {
@@ -13,4 +23,16 @@ body {
 
 #tid-selection {
     background-color: black;
+}
+
+#plot {
+    height: 100%;
+    width: 100%;
+}
+
+#more-details {
+    height: 100%;
+    width: 50%;
+    float:left;
+    background-color: white;
 }
