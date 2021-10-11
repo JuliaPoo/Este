@@ -103,6 +103,10 @@ class ParsedProcess():
         self._process_trace:List[dict] = self._loadTrace(
             self.directory / f"pid{self.pid}.trace.csv")
 
+        # Loads all routines
+        self._loadRtn(
+            self.directory / f"pid{self.pid}.rtn.csv")
+
         # Split trace into different threads
         self.threads:List[ParsedThread] = self._splitTraceToThreads(
             self._process_trace, self.nodes)
@@ -133,6 +137,23 @@ class ParsedProcess():
             for row in reader:
                 trace.append(dict(zip(headers, row)))
         return trace
+
+    def _loadRtn(self, rtn_filename:str):
+
+        """Loads routines into self.nodes"""
+
+        routines = list()
+        with open(rtn_filename) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='|')
+            headers = next(reader)
+            for row in reader:
+                routines.append(dict(zip(headers, row)))
+
+        for trace in self._process_trace:
+            rtn_called_idx = int(trace["rtn_called_idx"])
+            bb_idx = int(trace["bb_idx"])
+            if rtn_called_idx != -1 and rtn_called_idx != 0:
+                self.nodes[bb_idx]["rtn_called"] = routines[int(rtn_called_idx)]["rtn_name"]
 
     @staticmethod
     def _splitTraceToThreads(trace:List[dict], nodes:List[dict]) -> List[ParsedThread]:

@@ -81,7 +81,8 @@ function createGraph(elem, filename)
     .linkWidth(link => 1/params.frequencySensitivity * Math.log(link.count) + 1)
     .linkOpacity(params.linkOpacity)
     .linkCurvature(link => (link.target == link.source) ? 1 : 0)
-    .linkColor(link => (link.hasOwnProperty('non_white')) ? colour_link : 0);
+    .linkColor(link => (link.hasOwnProperty('non_white')) ? colour_link : 0)
+    .nodeLabel(node => node.rtn_called);
 
   graph.controls().dynamicDampingFactor = 0.8; // Make controls crisp
   return graph;
