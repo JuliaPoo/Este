@@ -23,10 +23,17 @@ KNOB<std::string> knobs_config_file(KNOB_MODE_WRITEONCE, "pintool",
 "         binary-whitelist @type List[str]:\n"                               \
 "             Este will analyse only binaries in this list\n"             
  
+#define LOG_DYNAMICALLY_GENERATED_DOCUMENTATION                              \
+"        log-dynamically-generated @type bool:\n"                            \
+"             Log execution of code outside of loaded binaries (e.g. in the heap/stack)\n" \
+"             For programs running in Wow64, the log might get cluttered due to \n"        \
+"             logging of Heaven's Gate\n"
+
 
 std::vector<std::string> whitelist_binaries;
 std::string output_dir;
 std::string output_prefix;
+bool log_dynamically_generated = false;
 
 void _parse_output_table(toml_table_t* conf)
 {
@@ -82,6 +89,16 @@ void _parse_analysis_scope_table(toml_table_t* conf)
                 whitelist_binaries.push_back(fn.u.s);
             }
         }
+
+        toml_datum_t log_dynamic = toml_bool_in(taint_policy, "log-dynamically-generated");
+        if (!log_dynamic.ok) {
+            LOGGING("[CONFIG] Missing config `log-dynamically-generated`\n");
+            LOGGING(LOG_DYNAMICALLY_GENERATED_DOCUMENTATION "\n");
+            RAISE_EXCEPTION("Missing option `log-dynamically-generated` in table [ANALYSIS-SCOPE] in config file!");
+        }
+        else {
+            log_dynamically_generated = log_dynamic.u.b;
+        }
     }
 }
 
@@ -113,6 +130,7 @@ void parse_config_file(const std::string configfile)
 
     LOGGING("[CONFIG] Final config: output-dir = %s", output_dir.c_str());
     LOGGING("[CONFIG] Final config: binary-whitelist = %s", _taint_whitelist_str.str().c_str());
+    LOGGING("[CONFIG] Final config: log-dynamically-generated = %s", log_dynamically_generated ? "true" : "false");
 }
 
 void Knobs::Init()
@@ -120,6 +138,13 @@ void Knobs::Init()
     is_init = true;
     auto config_file = knobs_config_file.Value();
     parse_config_file(config_file);
+}
+
+bool Knobs::isLogDynamicallyGenerated()
+{
+    if (!is_init)
+        RAISE_EXCEPTION("Knobs not initialised before calling `isLogDynamicallyGenerated`! Call Knobs::Init()");
+    return log_dynamically_generated;
 }
 
 std::vector<std::string> Knobs::getWhitelistBinaries()

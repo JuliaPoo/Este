@@ -8,6 +8,9 @@ namespace Knobs {
 	// Parses the config toml file and initialises logging.
 	void Init();
 
+	// Returns whether to log dynamically generated code
+	bool isLogDynamicallyGenerated();
+
 	// Get whitelisted binaries list
 	std::vector<std::string> getWhitelistBinaries();
 
