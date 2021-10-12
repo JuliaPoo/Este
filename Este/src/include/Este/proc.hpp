@@ -74,6 +74,10 @@ namespace Ctx {
 		// Checks if routine has already been serialized
 		bool isRtnSerialized(ADDRINT addr) const;
 
+		// Checks if address is to be logged
+		// Depends on Knobs. Logs according to `binary-whitelist` and `log-dynamically-generated`
+		bool isToBeLogged(ADDRINT addr) const;
+
 	private:
 
 		// Lock that ensures safe access into this->images

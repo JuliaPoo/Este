@@ -4,6 +4,7 @@
 #include "Este\rtn.hpp"
 #include "Este\bb.hpp"
 #include "Este\errors.hpp"
+#include "Este\knobs.hpp"
 #include "Este\utils.hpp"
 
 using namespace Ctx;
@@ -213,4 +214,12 @@ bool Proc::isRtnSerialized(ADDRINT addr) const
 	bool ret = this->rtns.find(addr) != this->rtns.end();
 	const_cast<Proc*>(this)->_rtns_lock.reader_release(r);
 	return ret;
+}
+
+bool Proc::isToBeLogged(ADDRINT addr) const
+{
+	auto img = this->getImageExecutable(addr);
+	if (img == NULL)
+		return Knobs::isLogDynamicallyGenerated();
+	return img->isWhitelisted();
 }

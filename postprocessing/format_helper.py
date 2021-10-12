@@ -66,6 +66,11 @@ class ParsedThread():
 
             # Adds the link between split traces
             if trace_id != end_trace:
+
+                # Check if next trace has nodes.
+                if len(split_trace[trace_id+1]) == 0:
+                    continue
+
                 edge = {}
                 edge['target'] = split_trace[trace_id+1][0]['bb_idx']
                 edge['source'] = trace[-1]['bb_idx']

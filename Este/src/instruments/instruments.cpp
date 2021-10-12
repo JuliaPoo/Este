@@ -67,10 +67,8 @@ VOID BblAft(const CONTEXT* pinctx, ADDRINT instptr, ADDRINT bbl_addr, THREADID t
     int32_t rtn_idx = -1;
     if (target_addr) {
 
-        auto img = procCtx->getImageExecutable(target_addr);
-
         // Log only routine calls outside of whitelist
-        if (img != NULL && !img->isWhitelisted()) {
+        if (procCtx->isToBeLogged(target_addr)) {
 
             std::stringstream rtn_name;
             auto rtn = procCtx->getRtn(target_addr);
@@ -113,8 +111,7 @@ VOID Trace(TRACE trace, Ctx::Proc* procCtx)
     auto taddr = TRACE_Address(trace);
 
     // Check if trace is within whitelisted binaries
-    auto img = procCtx->getImageExecutable(taddr);
-    if (!(img == NULL || img->isWhitelisted())) {
+    if (!procCtx->isToBeLogged(taddr)) {
         TRACE_InsertCall(trace, IPOINT_BEFORE, (AFUNPTR)TraceExitedWhitelisted, 
             IARG_PTR, procCtx,
             IARG_END);
