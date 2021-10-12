@@ -15,12 +15,13 @@ static TLS_KEY tls_key = 0xcccccccc;
 VOID PrepareForFiniFunctionFini(Ctx::Proc* procCtx)
 {
     // Destroy proc object
-    LOGGING("Proc deleted!");
-    delete procCtx;
+    LOGGING("Process finishing");
 }
 
 VOID Fini(INT32 code, Ctx::Proc* procCtx)
 {
+    LOGGING("Proc deleted!");
+    delete procCtx;
     LOGGING("Process terminated with code %d", code);
 }
 
@@ -68,7 +69,7 @@ VOID BblAft(const CONTEXT* pinctx, ADDRINT instptr, ADDRINT bbl_addr, THREADID t
     if (target_addr) {
 
         // Log only routine calls outside of whitelist
-        if (procCtx->isToBeLogged(target_addr)) {
+        if (!procCtx->isToBeLogged(target_addr)) {
 
             std::stringstream rtn_name;
             auto rtn = procCtx->getRtn(target_addr);

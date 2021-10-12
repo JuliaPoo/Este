@@ -105,21 +105,25 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate\</IntDir>
+    <TargetName>$(ProjectName)-32</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate\</IntDir>
+    <TargetName>$(ProjectName)-32</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate\</IntDir>
+    <TargetName>$(ProjectName)-64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)build\$(Configuration)-$(Platform)\intermediate\</IntDir>
     <OutDir>$(SolutionDir)build\$(Configuration)-$(Platform)\</OutDir>
+    <TargetName>$(ProjectName)-64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
