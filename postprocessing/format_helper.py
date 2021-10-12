@@ -177,7 +177,10 @@ class ParsedProcess():
         for os_tid, pin_tid in all_tid:
             # Get trace for pid
             thread_trace = [bb for bb in trace if int(bb["pin_tid"]) == pin_tid]
-            thread_nodes = [nodes[idx] for idx in set(int(bb['bb_idx']) for bb in thread_trace)]
+            thread_nodes = [nodes[idx] for idx in 
+                set(int(bb['bb_idx']) for bb in thread_trace) 
+                if idx!=-1]
+
             threads.append(
                 ParsedThread(os_tid, pin_tid, thread_trace, thread_nodes, routines))
 
