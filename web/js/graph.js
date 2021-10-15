@@ -26,11 +26,12 @@ class EsteGraph {
          * that define the look of the visualization
          * given `params` (see above).
          */
-
         this._hovered_node = undefined;
+        this._clicked_node = undefined;
         this.graphCallbacks = {
             nodeColor: params => node => {
-                return this._hovered_node == node ? "red" : "white";
+                return this._clicked_node == node ? 'rgb(128,255,220)' : 
+                    (this._hovered_node == node ? "rgb(255,200,128)" : "white");
             },
             onNodeHover: params => node => {
                 // No change
@@ -39,6 +40,19 @@ class EsteGraph {
                 // update
                 this._hovered_node = node;
                 this.graph.nodeColor(this.graph.nodeColor());
+            },
+            onNodeClick: params => node => {
+                // No change
+                if (!node || this._clicked_node == node) return;
+                
+                // update
+                if (this._clicked_node != undefined) {
+                    this._clicked_node.__threeObj.scale.set(1,1,1);
+                }
+                this._clicked_node = node;
+                this.graph.nodeColor(this.graph.nodeColor());
+                this.graph.nodeRelSize(this.graph.nodeRelSize());
+                node.__threeObj.scale.set(2,2,2);
             },
             linkWidth: params => link => {
                 1/params.frequencySensitivity * Math.log(link.count) + 1
@@ -86,6 +100,7 @@ class EsteGraph {
             .enableNodeDrag(false)
             .nodeColor(this.graphCallbacks.nodeColor(this.user_params))
             .onNodeHover(this.graphCallbacks.onNodeHover(this.user_params))
+            .onNodeClick(this.graphCallbacks.onNodeClick(this.user_params))
             .linkWidth(this.graphCallbacks.linkWidth(this.user_params))
             .linkOpacity(this.graphCallbacks.linkOpacity(this.user_params))
             .linkCurvature(this.graphCallbacks.linkCurvature(this.user_params))
