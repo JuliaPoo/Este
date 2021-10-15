@@ -26,8 +26,8 @@
 </form>
 
 <div id="plot" class="row">
-  <div id="graph-3d" class="col-sm-8"></div>
-  <div id="more-details" class="col-sm-4"></div>
+  <div id="graph-3d" class="col-sm-8 col-md-8"></div>
+  <div id="more-details" class="col-sm-4 col-md-4"></div>
 </div>
 
 
@@ -96,12 +96,13 @@ tid_select.addEventListener("change", function() {
   }
   
   let elem = document.getElementById('graph-3d');
+  let more_details = document.getElementById('more-details');
   let filename = "gen/pid" + pid.toString() +
     "_tid" + os_tid.toString() +
     "_ptid" + pin_tid.toString() +
     ".json";
 
-  graph = new EsteGraph(elem, filename);
+  graph = new EsteGraph(elem, more_details, filename);
 })
 
 </script>

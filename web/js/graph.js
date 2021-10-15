@@ -4,11 +4,13 @@ class EsteGraph {
      * Constructs the graph
      * 
      * @param {domelement} elem Graph is plotted in this element
+     * @param {domelement} more_details More details abt a node is displayed here
      * @param {string} filename Filename that contains the data to be plotted
      */
-    constructor (elem, filename)
+    constructor (elem, more_details, filename)
     {
         this.elem = elem;
+        this.more_details;
         this.filename = filename;
 
         /*
@@ -53,6 +55,8 @@ class EsteGraph {
                 this.graph.nodeColor(this.graph.nodeColor());
                 this.graph.nodeRelSize(this.graph.nodeRelSize());
                 node.__threeObj.scale.set(2,2,2);
+
+                this.#displayMoreDetails();
             },
             linkWidth: params => link => {
                 return 1/params.frequencySensitivity * Math.log(link.count) + 1
@@ -85,6 +89,26 @@ class EsteGraph {
 
         // Create GUI
         this.#createGUI();
+
+        // Register event handlers
+        this.#registerHandlers();
+    }
+
+    /**
+     * Private method:
+     * Initializes the GUI that enables
+     * user to control `params`
+     */
+    #createGUI()
+    {
+        this.gui = new dat.GUI();
+        this.gui.add(this.user_params, "linkOpacity", 0.0, 1.0).onChange(
+            val => this.graph.linkOpacity(this.graphCallbacks.linkOpacity(this.user_params)));
+        this.gui.add(this.user_params, "frequencySensitivity", 0.0, 1.0).onChange(
+            val => this.graph.linkWidth(this.graphCallbacks.linkWidth(this.user_params)));
+        this.gui.add(this.user_params, "fontSize", 1, 100, 1).onChange(
+            val => this.graph.linkThreeObject(this.graphCallbacks.linkThreeObject(this.user_params)));
+        this.gui.close(); 
     }
 
     /**
@@ -116,20 +140,21 @@ class EsteGraph {
         this.graph.controls().dynamicDampingFactor = 0.8; // Make controls crisp
     }
 
-    /**
-     * Private method:
-     * Initializes the GUI that enables
-     * user to control `params`
-     */
-    #createGUI()
+    #registerHandlers()
     {
-        this.gui = new dat.GUI();
-        this.gui.add(this.user_params, "linkOpacity", 0.0, 1.0).onChange(
-            val => this.graph.linkOpacity(this.graphCallbacks.linkOpacity(this.user_params)));
-        this.gui.add(this.user_params, "frequencySensitivity", 0.0, 1.0).onChange(
-            val => this.graph.linkWidth(this.graphCallbacks.linkWidth(this.user_params)));
-        this.gui.add(this.user_params, "fontSize", 1, 100, 1).onChange(
-            val => this.graph.linkThreeObject(this.graphCallbacks.linkThreeObject(this.user_params)));
-        this.gui.close(); 
+        window.addEventListener('resize', () => {
+
+            var W = this.elem.clientWidth;
+            var H = this.elem.clientHeight;
+
+            this.graph.camera().aspect = W/H;
+            this.graph.camera().updateProjectionMatrix();
+            this.graph.renderer().setSize(W, H);
+
+        }, false);
+    }
+    #displayMoreDetails()
+    {
+        this.more_details;
     }
 }
