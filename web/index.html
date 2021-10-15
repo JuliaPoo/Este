@@ -101,8 +101,7 @@ tid_select.addEventListener("change", function() {
     "_ptid" + pin_tid.toString() +
     ".json";
 
-  graph = createGraph(elem, filename);
-  createGUI(graph);
+  graph = new EsteGraph(elem, filename);
 })
 
 </script>
