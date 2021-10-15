@@ -1,4 +1,6 @@
-class EsteGraph {
+import * as CALLBACK from "./callback.js"
+
+export class EsteGraph {
     
     /**
      * Constructs the graph
@@ -10,7 +12,7 @@ class EsteGraph {
     constructor (elem, more_details, filename)
     {
         this.elem = elem;
-        this.more_details;
+        this.more_details = more_details;
         this.filename = filename;
 
         /*
@@ -56,7 +58,7 @@ class EsteGraph {
                 this.graph.nodeRelSize(this.graph.nodeRelSize());
                 node.__threeObj.scale.set(2,2,2);
 
-                this.#displayMoreDetails();
+                this.#displayMoreDetails(node);
             },
             linkWidth: params => link => {
                 return 1/params.frequencySensitivity * Math.log(link.count) + 1
@@ -140,6 +142,10 @@ class EsteGraph {
         this.graph.controls().dynamicDampingFactor = 0.8; // Make controls crisp
     }
 
+    /**
+     * Private method:
+     * Register window handles for EsteGraph
+     */
     #registerHandlers()
     {
         window.addEventListener('resize', () => {
@@ -153,8 +159,15 @@ class EsteGraph {
 
         }, false);
     }
-    #displayMoreDetails()
+
+    /**
+     * Private method:
+     * Display more details about the node
+     * @param {ForceGraph3D node} node node to get more details of 
+     */
+    #displayMoreDetails(node)
     {
-        this.more_details;
+        this.more_details.innerText = node.id;
+        CALLBACK.query_server_node_details(node);
     }
 }

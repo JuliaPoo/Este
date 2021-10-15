@@ -40,7 +40,12 @@ body {
 }
 
 #more-details {
-    padding: 0; 
+    padding: 20px; 
     margin: 0;
-    background-color:aqua;
+    background-color:rgb(0, 0, 0);
+    border-width:3px 3px 3px;
+    border-style:solid;
+    border-color:cyan;
+    color:white;
+    overflow:auto;
 }

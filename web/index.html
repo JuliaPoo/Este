@@ -30,11 +30,10 @@
   <div id="more-details" class="col-sm-4 col-md-4"></div>
 </div>
 
+<script type="module">
 
-<!-- Import graph definitions -->
-<script src="./js/graph.js"></script>
-
-<script>
+// Import graph definitions
+import {EsteGraph} from "./js/graph.js"
 
 /*
  * Event handlers:
@@ -102,7 +101,7 @@ tid_select.addEventListener("change", function() {
     "_ptid" + pin_tid.toString() +
     ".json";
 
-  graph = new EsteGraph(elem, more_details, filename);
+  new EsteGraph(elem, more_details, filename);
 })
 
 </script>
