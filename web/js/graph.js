@@ -55,25 +55,29 @@ class EsteGraph {
                 node.__threeObj.scale.set(2,2,2);
             },
             linkWidth: params => link => {
-                1/params.frequencySensitivity * Math.log(link.count) + 1
+                return 1/params.frequencySensitivity * Math.log(link.count) + 1
             },
             linkOpacity: params => params.linkOpacity,
-            linkCurvature: params => link => (link.target == link.source) ? 1 : 0,
-            linkColor: params => link => (link.hasOwnProperty('non_white')) ? "green" : 0,
+            linkCurvature: params => link => {
+                return (link.target == link.source) ? 1 : 0;
+            },
+            linkColor: params => link => {
+                return (link.hasOwnProperty('non_white')) ? "green" : 0;
+            },
             linkThreeObject: params => link => {
                 // extend link with text sprite
                 const sprite = new SpriteText(link.rtn_called);
                 sprite.color = 'white';
                 sprite.textHeight = params.fontSize;
                 return sprite;
-                },
+            },
             linkPositionUpdate: params => (sprite, { start, end }) => {
                 const middlePos = Object.assign(...['x', 'y', 'z'].map(c => ({
                     [c]: start[c] + (end[c] - start[c]) / 2 // calc middle point
                 })));
                 // Position sprite
                 Object.assign(sprite.position, middlePos);
-                },
+            },
         }
 
         // Create graph
