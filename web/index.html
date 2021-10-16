@@ -96,12 +96,7 @@ tid_select.addEventListener("change", function() {
   
   let elem = document.getElementById('graph-3d');
   let more_details = document.getElementById('more-details');
-  let filename = "gen/pid" + pid.toString() +
-    "_tid" + os_tid.toString() +
-    "_ptid" + pin_tid.toString() +
-    ".json";
-
-  new EsteGraph(elem, more_details, filename);
+  new EsteGraph(elem, more_details, pid, os_tid, pin_tid);
 })
 
 </script>

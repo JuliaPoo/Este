@@ -7,13 +7,22 @@ export class EsteGraph {
      * 
      * @param {domelement} elem Graph is plotted in this element
      * @param {domelement} more_details More details abt a node is displayed here
-     * @param {string} filename Filename that contains the data to be plotted
+     * @param {int} pid Process ID to be plotted
+     * @param {int} os_tid OS Thread ID to be plotted
+     * @param {int} pin_tid PIN Thread ID to be plotted
      */
-    constructor (elem, more_details, filename)
+    constructor (elem, more_details, pid, os_tid, pin_tid)
     {
+
         this.elem = elem;
         this.more_details = more_details;
-        this.filename = filename;
+        this.pid = pid;
+        this.os_tid = os_tid;
+        this.pin_tid = pin_tid;
+        this.filename = "gen/pid" + pid.toString() +
+            "_tid" + os_tid.toString() +
+            "_ptid" + pin_tid.toString() +
+            ".json";
 
         /*
         * User controllable parameters 
@@ -157,7 +166,7 @@ export class EsteGraph {
 
             var W = this.elem.clientWidth;
             var H = this.elem.clientHeight;
-            
+
             this.graph
                 .width(W)
                 .height(H);
@@ -172,9 +181,8 @@ export class EsteGraph {
      */
     #displayMoreDetails(node)
     {
-        this.more_details.innerText = node.id;
-        CALLBACK.query_server_node_details(node).then(data => {
-            console.log(data);
-        });
+        CALLBACK.query_server_node_details(node, this.pid, this.pin_tid, data=>{
+            this.more_details.innerText = node.id;
+        })
     }
 }
