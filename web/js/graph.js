@@ -104,12 +104,16 @@ export class EsteGraph {
     #createGUI()
     {
         this.gui = new dat.GUI();
+
+        this.gui.domElement.id = 'graph-config';
+
         this.gui.add(this.user_params, "linkOpacity", 0.0, 1.0).onChange(
             val => this.graph.linkOpacity(this.graphCallbacks.linkOpacity(this.user_params)));
         this.gui.add(this.user_params, "frequencySensitivity", 0.0, 1.0).onChange(
             val => this.graph.linkWidth(this.graphCallbacks.linkWidth(this.user_params)));
         this.gui.add(this.user_params, "fontSize", 1, 100, 1).onChange(
             val => this.graph.linkThreeObject(this.graphCallbacks.linkThreeObject(this.user_params)));
+
         this.gui.close(); 
     }
 
@@ -140,6 +144,7 @@ export class EsteGraph {
             .linkPositionUpdate(this.graphCallbacks.linkPositionUpdate(this.user_params));
     
         this.graph.controls().dynamicDampingFactor = 0.8; // Make controls crisp
+        this.elem.firstChild.style.position = "absolute";
     }
 
     /**
@@ -152,10 +157,10 @@ export class EsteGraph {
 
             var W = this.elem.clientWidth;
             var H = this.elem.clientHeight;
-
-            this.graph.camera().aspect = W/H;
-            this.graph.camera().updateProjectionMatrix();
-            this.graph.renderer().setSize(W, H);
+            
+            this.graph
+                .width(W)
+                .height(H);
 
         }, false);
     }
@@ -168,6 +173,8 @@ export class EsteGraph {
     #displayMoreDetails(node)
     {
         this.more_details.innerText = node.id;
-        CALLBACK.query_server_node_details(node);
+        CALLBACK.query_server_node_details(node).then(data => {
+            console.log(data);
+        });
     }
 }
