@@ -76,7 +76,10 @@ class EsteDataHandler:
 
         # image_path
         img_idx = int(node['image_idx'])
-        img = pid_info['binaries_loaded'][img_idx]
-        node['image_path'] = img['path']
+        if (img_idx == -1):
+            node['image_path'] = "None"
+        else:
+            img = pid_info['binaries_loaded'][img_idx]
+            node['image_path'] = img['path']
 
         return node
