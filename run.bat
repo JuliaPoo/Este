@@ -23,4 +23,4 @@ for /f "tokens=1,* delims= " %%a in ("%*") do set RUN_COMMAND=%%b
 python postprocessing/main.py
 
 :: Launch visualization
-python web/server.py
+python web/server.py 7777
