@@ -5,7 +5,6 @@
   <script src="//unpkg.com/three-spritetext"></script>
   <script src="//unpkg.com/dat.gui"></script>
   <script src="//unpkg.com/3d-force-graph"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   
   <link rel="stylesheet" href="css/index.css">
 
@@ -43,7 +42,10 @@ let pids_tid_map;
 let pid_select = document.getElementById("pid-selection");
 let tid_select = document.getElementById("tid-selection");
 
-$.getJSON( "gen/pid_tid_map.json", function( data ) {
+// Load pids and tids available
+(async () => {
+  const res = await fetch("gen/pid_tid_map.json");
+  const data = await res.json();
   pids_tid_map = data;
   for (let pid in data) {
     let option_str = pid.toString();
@@ -52,7 +54,7 @@ $.getJSON( "gen/pid_tid_map.json", function( data ) {
     pid_option.textContent += option_str;
     pid_select.appendChild(pid_option);
   }
-})
+})().catch(console.error)
 
 pid_select.addEventListener("change", function() {
     let pid = pid_select.value;

@@ -183,12 +183,10 @@ export class EsteGraph {
      */
     #displayMoreDetails(node)
     {
-        CALLBACK.query_server_node_details(node, this.pid, this.pin_tid, node=>{
+        CALLBACK.query_server_node_details(node, this.pid, this.pin_tid).then(node => {
             
             let dets = "Node #" + node.id.toString() + "\n\n";
-
             dets += "Image: " + node.image_path.toString() + "\n\n";
-
             dets += "Executed Count: " + node.count.toString() + "\n\n";
 
             dets += "Disassembly:\n";
@@ -198,6 +196,6 @@ export class EsteGraph {
             dets += "\n";
 
             this.more_details.innerText = dets;
-        })
+        });
     }
 }
