@@ -49,6 +49,36 @@ body {
     border-color:cyan;
     color:white;
     overflow:auto;
+    max-height: 100%;
+}
+
+.split-container {
+    /* match parent size */
+    width: 100%;
+    height: 100%;
+    /* tell child containers to grow */
+    display: flex;
+    /* items should be arranged in columns */
+    flex-direction: column;
+}
+
+.split-section-main {
+    /* items should take up as much space as it can */
+    flex-grow: 3;
+    flex-basis: 0;
+}
+
+.split-section {
+    /* items should take up as much space as it can */
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+@media screen and (min-width: 920px) {
+    .split-container {
+        /* when the screen is big, change the arrangement to rows */
+        flex-direction: row;
+    }
 }
 
 #graph-config {

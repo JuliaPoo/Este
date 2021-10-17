@@ -24,6 +24,9 @@ class ParsedThread():
         self.links: List[dict] = self._splitTraceToLinks(
             self._split_trace, routines)
 
+        # Build calculated attributes for self.nodes
+        self._build_nodes()
+
     @staticmethod
     def _splitTrace(trace:List[dict]) -> List[List[dict]]:
 
@@ -95,6 +98,12 @@ class ParsedThread():
 
         return unique_links
 
+    def _build_nodes(self):
+
+        bbidx = Counter([t['bb_idx'] for t in self._full_trace])
+        for bb in self.nodes:
+            bb['count'] = bbidx[bb['id']]
+
     def outputToJson(self, filename:str):
         data = {"nodes": self.nodes, "links": self.links}
         with open(filename, 'w', encoding='utf-8') as f:
@@ -150,7 +159,8 @@ class ParsedProcess():
                 trace.append(dict(zip(headers, row)))
         return trace
 
-    def _loadRtn(self, rtn_filename:str):
+    @staticmethod
+    def _loadRtn(rtn_filename:str) -> List[dict]:
 
         """Loads routines into a dictionary"""
 

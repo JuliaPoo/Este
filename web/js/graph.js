@@ -74,7 +74,9 @@ export class EsteGraph {
             },
             linkOpacity: params => params.linkOpacity,
             linkCurvature: params => link => {
-                return (link.target == link.source) ? 1 : 0;
+                return (
+                    link.target == link.source
+                ) ? 1 : 0;
             },
             linkColor: params => link => {
                 return (link.hasOwnProperty('non_white')) ? "green" : 0;
@@ -181,8 +183,21 @@ export class EsteGraph {
      */
     #displayMoreDetails(node)
     {
-        CALLBACK.query_server_node_details(node, this.pid, this.pin_tid, data=>{
-            this.more_details.innerText = node.id;
+        CALLBACK.query_server_node_details(node, this.pid, this.pin_tid, node=>{
+            
+            let dets = "Node #" + node.id.toString() + "\n\n";
+
+            dets += "Image: " + node.image_path.toString() + "\n\n";
+
+            dets += "Executed Count: " + node.count.toString() + "\n\n";
+
+            dets += "Disassembly:\n";
+            for (let l of node.disassembly) {
+                dets += l + "\n";
+            }
+            dets += "\n";
+
+            this.more_details.innerText = dets;
         })
     }
 }

@@ -1,3 +1,5 @@
+from datahandler import EsteDataHandler
+
 from http.server import HTTPServer, CGIHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import webbrowser
@@ -12,32 +14,24 @@ CUR_DIR = pathlib.Path(os.path.dirname(os.path.realpath(__file__)))
 os.chdir(CUR_DIR)
 
 USAGE = "Usage: python %s [int:port number]"
-
-class EsteDataHandler:
-
-    def __init__(self):
-        pass
-
-    def get_node_details(self, id, pid, ptid):
-        return "[1,2,3]"
         
 class EsteServerHandler(CGIHTTPRequestHandler):
     
-    _data_handler = EsteDataHandler()
+    _data_handler = EsteDataHandler(CUR_DIR)
 
-    def _send_error(self, code, error):
+    def _send_error(self, code:int, error:str) -> None:
         self.send_response(code)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
         self.wfile.write(error.encode())
 
-    def _send_json_header(self, cnt):
+    def _send_json_header(self, cnt:str) -> None:
         self.send_response(200)
         self.send_header('Content-Length', str(len(cnt)))
         self.send_header('Content-type', 'application/json')
         self.end_headers()
 
-    def _handle_GET_node(self, url):
+    def _handle_GET_node(self, url:str) -> None:
 
         logging.info(f"GET: {self.path}")
         
@@ -46,16 +40,16 @@ class EsteServerHandler(CGIHTTPRequestHandler):
         pid = int(params['pid'][0])
         ptid = int(params['pin_tid'][0])
 
-        dets = self._data_handler.get_node_details(id, pid, ptid)
+        node = self._data_handler.get_node_details(id, pid, ptid)
+        node = json.dumps(node).encode()
 
-        self._send_json_header(dets)
-        self.wfile.write(dets.encode())
+        self._send_json_header(node)
+        self.wfile.write(node)
 
-    def do_GET(self):
+    def do_GET(self) -> None:
 
         url = urlparse(self.path)
 
-        print(url.path)
         if url.path == "/callback/node":
             try:
                 self._handle_GET_node(url)
@@ -64,10 +58,11 @@ class EsteServerHandler(CGIHTTPRequestHandler):
                     400, f"Error handling GET request to `{self.path}`! {repr(e)}")
             return
 
+        # Hand over to CGIHTTPRequestHandler
         super(EsteServerHandler, self).do_GET()
 
     
-def serve(port):
+def serve(port:int) -> None:
 
     '''Starts the webserver'''
 
@@ -85,13 +80,14 @@ def serve(port):
     logging.info(f'Stopping Este server at port {port}...\n')
     srv.server_close()
 
-def launch(port):
+def launch(port:int) -> None:
 
     '''Launches a browser tab'''
 
     webbrowser.open(f'http://localhost:{port}') 
+    return
 
-def main():
+def main() -> int:
 
     from sys import argv
     logging.basicConfig(level=logging.INFO)

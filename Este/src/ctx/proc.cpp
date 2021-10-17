@@ -17,6 +17,15 @@ Proc::Proc()
 	Serial::getDbSerial()
 		<< "{" // Open
 		<< "\"pid\":" << pid << ","
+		<< "\"architecture\":"
+#if (defined TARGET_IA32E)
+		<< "\"ARCH_X8664\""
+#elif (defined TARGET_IA32)
+		<< "\"ARCH_X86\""
+#else
+#error "Architecture not defined!"
+#endif
+		<< ","
 		<< "\"binaries_loaded\":" << "["; // Open list for binaries
 
 	// Write headers for bb
