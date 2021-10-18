@@ -12,7 +12,7 @@
 
 <body>
 
-<form id="pid-tid-selection">
+<div id="UI">
   <label for="pid">PID to analyse:</label>
   <select id="pid-selection" name="pid">
     <option value="none">None</option>
@@ -21,7 +21,8 @@
   <select id="tid-selection" name="tid" disabled>
     <option value="none">None</option>
   </select>
-</form>
+  <button id="terminate">Terminate Session</button>
+</div>
 
 <div id="plot" class="split-container">
   <div id="graph-3d" class="split-section-main"></div>
@@ -32,6 +33,7 @@
 
 // Import graph definitions
 import {EsteGraph} from "./js/graph.js"
+import * as CALLBACK from "./js/callback.js"
 
 /*
  * Event handlers:
@@ -41,6 +43,7 @@ import {EsteGraph} from "./js/graph.js"
 let pids_tid_map;
 let pid_select = document.getElementById("pid-selection");
 let tid_select = document.getElementById("tid-selection");
+let terminate  = document.getElementById("terminate");
 
 // Load pids and tids available
 (async () => {
@@ -98,7 +101,16 @@ tid_select.addEventListener("change", function() {
   let elem = document.getElementById('graph-3d');
   let more_details = document.getElementById('more-details');
   new EsteGraph(elem, more_details, pid, os_tid, pin_tid);
-})
+});
+
+terminate.addEventListener("click", function() {
+  console.log("Terminating session...");
+  CALLBACK.send_terminate_signal().then(success => {
+    if (success) {
+      window.close();
+    }
+  });
+});
 
 </script>
 </body>

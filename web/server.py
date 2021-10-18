@@ -19,6 +19,12 @@ class EsteServerHandler(CGIHTTPRequestHandler):
     
     _data_handler = EsteDataHandler(CUR_DIR)
 
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        super(EsteServerHandler, self).end_headers()
+
     def _send_error(self, code:int, error:str) -> None:
         self.send_response(code)
         self.send_header('Content-type', 'text/html')
@@ -33,8 +39,6 @@ class EsteServerHandler(CGIHTTPRequestHandler):
 
     def _handle_GET_node(self, url:str) -> None:
 
-        logging.info(f"GET: {self.path}")
-        
         params = parse_qs(url.query)
         id = int(params['id'][0])
         pid = int(params['pid'][0])
@@ -46,6 +50,11 @@ class EsteServerHandler(CGIHTTPRequestHandler):
         self._send_json_header(node)
         self.wfile.write(node)
 
+    def _handle_GET_terminate(self, url:str) -> None:
+
+        self._send_error(200, "Terminating signal received...")
+        SERVER.server_close()
+        
     def do_GET(self) -> None:
 
         url = urlparse(self.path)
@@ -57,6 +66,9 @@ class EsteServerHandler(CGIHTTPRequestHandler):
                 self._send_error(
                     400, f"Error handling GET request to `{self.path}`! {repr(e)}")
             return
+        if url.path == "/callback/terminate":
+            self._handle_GET_terminate(url)
+            return
 
         # Hand over to CGIHTTPRequestHandler
         super(EsteServerHandler, self).do_GET()
@@ -66,19 +78,23 @@ def serve(port:int) -> None:
 
     '''Starts the webserver'''
 
+    global SERVER
+
     # Create server object listening the port 7777
-    srv = HTTPServer(
+    SERVER = HTTPServer(
         server_address = ('', port), 
         RequestHandlerClass = EsteServerHandler)
 
     try:
         logging.info(f'Starting Este server at port {port}...\n')
-        srv.serve_forever()
+        SERVER.serve_forever()
     except KeyboardInterrupt:
         pass
+    except Exception as e:
+        logging.info(f"Exception: {repr(e)}")
 
     logging.info(f'Stopping Este server at port {port}...\n')
-    srv.server_close()
+    SERVER.server_close()
 
 def launch(port:int) -> None:
 

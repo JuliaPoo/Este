@@ -15,3 +15,14 @@ export async function query_server_node_details(node, pid, pin_tid) {
     const data = await res.json();
     return data;
 }
+
+/**
+ * Does a get request to callback/terminate which shuts the server down
+ * @returns {bool} If server successfully terminated
+ */
+export async function send_terminate_signal() {
+    let url = "callback/terminate"
+    const res = await fetch(url);
+    console.log(res);
+    return res.ok;
+}

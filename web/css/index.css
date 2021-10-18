@@ -13,7 +13,7 @@ body {
     background-color:black;
 }
 
-#pid-tid-selection {
+#UI {
     display: inline-block;
     position: fixed;
     z-index: 100;
@@ -24,6 +24,10 @@ body {
 }
 
 #tid-selection {
+    background-color: black;
+}
+
+#terminate {
     background-color: black;
 }
 

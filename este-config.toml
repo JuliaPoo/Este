@@ -11,10 +11,10 @@ output-dir = "gen/Este-out"
 
 # binary-whitelist @type List[str]:
 #    Este will analyse only binaries in this list
-binary-whitelist = ["python.exe"]
+binary-whitelist = ["nc.exe"]
 
 # log-dynamically-generated @type bool:
 #    Log execution of code outside of loaded binaries (e.g. in the heap/stack)
 #    For programs running in Wow64, the log might get cluttered due to 
 #    logging of Heaven's Gate
-log-dynamically-generated = true
+log-dynamically-generated = false
