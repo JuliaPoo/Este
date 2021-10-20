@@ -10,3 +10,5 @@ postprocessing/__pycache__*
 web/gen/*
 
 pintool.log
+
+*__pycache__
