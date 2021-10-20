@@ -30,5 +30,88 @@
   <div id="more-details" class="col-sm-4"></div>
 </div>
 
-<script src="index.js"></script>
+<script type="module">
+
+// Import graph definitions
+import {EsteGraph} from "./js/graph.mjs"
+import * as CALLBACK from "./js/callback.mjs"
+
+/*
+ * Event handlers:
+ * Handling of PID/TID selection and graph creation
+ */
+
+let pids_tid_map;
+let pid_select = document.getElementById("pid-selection");
+let tid_select = document.getElementById("tid-selection");
+let terminate  = document.getElementById("terminate");
+
+// Load pids and tids available
+(async () => {
+  const res = await fetch("gen/pid_tid_map.json");
+  const data = await res.json();
+  pids_tid_map = data;
+  for (let pid in data) {
+    let option_str = pid.toString();
+    let pid_option = document.createElement("option");
+    pid_option.setAttribute("value", option_str);
+    pid_option.textContent += option_str;
+    pid_select.appendChild(pid_option);
+  }
+})().catch(console.error)
+
+pid_select.addEventListener("change", function() {
+    let pid = pid_select.value;
+
+    if (pid === "none") {
+      tid_select.setAttribute("disabled", true);
+      tid_select.value = "none"
+      return;
+    }
+
+    while (tid_select.childElementCount != 1) {
+      tid_select.removeChild(tid_select.lastChild);
+    }
+    let tids = pids_tid_map[pid];
+    for (let tid of tids) {
+      let option_str = tid.pin_tid.toString() + ": " + tid.os_tid.toString()
+      let tid_option = document.createElement("option");
+      tid_option.setAttribute("value", tid.pin_tid.toString());
+      tid_option.textContent += option_str;
+      tid_select.appendChild(tid_option);
+    }
+    tid_select.removeAttribute('disabled');
+});
+
+tid_select.addEventListener("change", function() {
+
+  if (tid_select.value == "none") {
+    return;
+  }
+
+  let pid = pid_select.value;
+  let pin_tid = tid_select.value;
+  let os_tid;
+  for (let tid of pids_tid_map[pid]) {
+    if (tid.pin_tid == pin_tid) {
+      os_tid = tid.os_tid;
+      break;
+    }
+  }
+  
+  let elem = document.getElementById('graph-3d');
+  let more_details = document.getElementById('more-details');
+  new EsteGraph(elem, more_details, pid, os_tid, pin_tid);
+});
+
+terminate.addEventListener("click", function() {
+  console.log("Terminating session...");
+  CALLBACK.send_terminate_signal().then(success => {
+    if (success) {
+      window.close();
+    }
+  });
+});
+
+</script>
 </body>
