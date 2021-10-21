@@ -61,48 +61,34 @@ Este Pintool outputs 5 files.
 3. Images loaded
 
 `pid<pid>.rtn.csv` contains all routines encountered (including those not executed) that are outside of the whitelisted binaries specified in `-config-file`. The fields are:
-1. `idx`
-    - Index of routine
-2. `addr`
-    - Address that marks the start of the routine
-3. `rtn_name`
-    - Name of routine.
-    - Name of routine relies on symbols available. Otherwise it will be named `sub_<addr>`
-4. `image_idx`
-    - Index of image (as specified in `pid<pid>.este.json`) at which the routine belongs in.
-    - `image_idx = -1` if it doesn't belong to an image.
-5. `section_idx`
-    - Index if executable section within image (as specified in `pid<pid>.este.json`) at which the routine belongs in
-    - `section_idx = -1` if it doesn't belong to a section
+
+| Name | Description |
+| ---- | ----------- |
+| `idx` | - Index of routine |
+| `addr` | - Address that marks the start of the routine |
+| `rnt_name` | - Name of routine <br> - Name of routine relies on symbols available. Otherwise it will be named `sub_<addr>`|
+| `image_idx` | - Index of image (as specified in `pid<pid>.este.json`) at which the routine belongs in. <br> - `image_idx = -1` if it doesn't belong to an image.|
+|`section_idx`| - Index if executable section within image (as specified in `pid<pid>.este.json`) at which the routine belongs in <br> - `section_idx = -1` if it doesn't belong to a section
 
 `pid<pid>.bb.csv` contains all Basic Blocks encountered within the whitelisted binaries specified in `-config-file`. Basic blocks are defined as a number of contiguous instructions that drop through. Jumps, conditional jumps, calls, returns, etc are at the end of every basic block. The fields are:
-1. `idx`
-    - Index of basic block (in order of first execution)
-2. `addr`
-    - Address of start of basic block
-3. `size`
-    - Size in bytes of basic block
-4. `bytes`
-    - Hex encoded bytes of basic block
-5. `image_idx`
-    - Index of image (as specified in `pid<pid>.este.json`) at which the block is in
-    - `image_idx = -1` if it doesn't belong to an image
-6. `section_idx`
-     - Index of executable section within image (as specified in `pid<pid>.este.json`) at which the block belongs in
-    - `section_idx = -1` if it doesn't belong to a section
+
+| Name | Description |
+| ---- | ----------- |
+| `idx` | - Index of basic block (in order of first execution) |
+| `addr` | - Address of start of basic block |
+| `size` | - Size in bytes of basic block |
+| `bytes` | - Hex encoded bytes of basic block |
+| `image_idx` | - Index of image (as specified in `pid<pid>.este.json`) at which the block is in <br> - `image_idx = -1` if it doesn't belong to an image
+| `section_idx` | - Index of executable section within image (as specified in `pid<pid>.este.json`) at which the block belongs in <br> - `section_idx = -1` if it doesn't belong to a section |
 
 `pid<pid>.trace.csv` contains all basic blocks executed that are within the whitelisted binaries in `-config-file`. E.g. in a loop, the blocks within the loop are logged multiple times within the trace file. The fields are:
 
-1. `bb_idx`
-    - Index of basic block executed (as specified in `pid<pid>.bb.csv`)
-    - `bb_idx = -1` if the basic block is outside of whitelisted binaries. This entry indicates a jump outside of whitelisted binaries.
-2. `os_tid`
-    - OS Thread ID that executed said block
-3. `pin_tid`
-    - PIN Thread ID that executed said block (order of creation)
-4. `rtn_called_idx`
-    - Index of routine called (as specified in `pid<pid>.rtn.csv`)
-    - `rtn_called_idx = -1` if no routine was called in basic block.
+| Name | Description |
+| ---- | ----------- |
+| `bb_idx` | - Index of basic block executed (as specified in `pid<pid>.bb.csv`) <br> - `bb_idx = -1` if the basic block is outside of whitelisted binaries. This entry indicates a jump outside of whitelisted binaries. |
+| `os_tid` | - OS Thread ID that executed said block |
+| `pin_tid` | - PIN Thread ID that executed said block (order of creation) |
+| `rtn_called_idx` | - Index of routine called (as specified in `pid<pid>.rtn.csv`) <br> - `rtn_called_idx = -1` if no routine was called in basic block. |
 
 ### Debugging Este Pintool
 
