@@ -102,7 +102,7 @@ namespace Ctx {
 		Sync::RW _serial_trace_lock;
 
 		// All images loaded
-		std::vector<Image> images;
+		std::map<ADDRINT, Image> images;
 
 		// All routines encountered
 		// starting address : rtn object
