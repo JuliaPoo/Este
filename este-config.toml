@@ -11,7 +11,7 @@ output-dir = "gen/Este-out"
 
 # binary-whitelist @type List[str]:
 #    Este will analyse only binaries in this list
-binary-whitelist = ["nc.exe"]
+binary-whitelist = ["nc.exe", "ipconfig.exe"]
 
 # log-dynamically-generated @type bool:
 #    Log execution of code outside of loaded binaries (e.g. in the heap/stack)

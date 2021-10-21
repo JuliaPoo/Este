@@ -24,6 +24,10 @@ export class EsteGraph {
             "_ptid" + pin_tid.toString() +
             ".json";
 
+        this.gData = this.#parseFile(this.filename);
+        this.#crossLinkNode();
+        console.log(this.gData);
+
         /*
         * User controllable parameters 
         * that tune the look of the visualization.
@@ -39,20 +43,30 @@ export class EsteGraph {
          * that define the look of the visualization
          * given `params` (see above).
          */
+        this._highlight_nodes = new Set();
+        this._highlight_links = new Set();
         this._hovered_node = undefined;
         this._clicked_node = undefined;
         this.graphCallbacks = {
             nodeColor: params => node => {
                 return this._clicked_node == node ? 'rgb(128,255,220)' : 
-                    (this._hovered_node == node ? "rgb(255,200,128)" : "white");
+                    (this._highlight_nodes.has(node) ? node === this._hovered_node ? 'rgb(255,0,0,1)' : "rgb(255,200,128)" : 'white');
+                    // (this._hovered_node == node ? "rgb(255,200,128)" : "white");
             },
             onNodeHover: params => node => {
-                // No change
-                if (!node || this._hovered_node == node) return;
-                
-                // update
-                this._hovered_node = node;
-                this.graph.nodeColor(this.graph.nodeColor());
+                // no state change
+                if ((!node && !this._highlight_nodes.size) || (node && this._hover_node === node)) return;
+
+                this._highlight_nodes.clear();
+                this._highlight_links.clear();
+
+                if (node) {
+                  this._highlight_nodes.add(node);
+                  node.neighbors.forEach(neighbor => this._highlight_nodes.add(neighbor));
+                  node.links.forEach(link => this._highlight_links.add(link));
+                }
+                this._hovered_node = node || null;
+                this.#updateHighlight();
             },
             onNodeClick: params => node => {
                 // No change
@@ -70,7 +84,7 @@ export class EsteGraph {
                 this.#displayMoreDetails(node);
             },
             linkWidth: params => link => {
-                return 1/params.frequencySensitivity * Math.log(link.count) + 1
+                return this._highlight_links.has(link) ? 4 : 1/params.frequencySensitivity * Math.log(link.count) + 1
             },
             linkOpacity: params => params.linkOpacity,
             linkCurvature: params => link => {
@@ -95,6 +109,24 @@ export class EsteGraph {
                 // Position sprite
                 Object.assign(sprite.position, middlePos);
             },
+            onLinkHover: params => link => {
+                this._highlight_nodes.clear();
+                this._highlight_links.clear();
+
+                if (link) {
+                  this._highlight_links.add(link);
+                  this._highlight_nodes.add(link.source);
+                  this._highlight_nodes.add(link.target);
+                }
+
+                this.#updateHighlight();
+            },
+            linkDirectionalParticles: params => link => {
+                return this._highlight_links.has(link) ? 4 : 0;
+            },
+            linkDirectionalParticleSpeed: params => link => {
+                return 1/params.frequencySensitivity * Math.log(link.count) + 1;
+            },
         }
 
         // Create graph
@@ -105,6 +137,53 @@ export class EsteGraph {
 
         // Register event handlers
         this.#registerHandlers();
+    }
+
+    /**
+     * Private method:
+     * Parses json file contents into a obj
+     * 
+     */
+    #parseFile(filename)
+    {
+        var Httpreq = new XMLHttpRequest(); // a new request
+        Httpreq.open("GET",filename,false);
+        Httpreq.send(null);
+        return JSON.parse(Httpreq.responseText);          
+    }
+
+    /**
+     * Private method:
+     * Adds neighbouring nodes and links to each object in gData
+     * 
+     */
+    #crossLinkNode()
+    {
+        this.gData.links.forEach(link => {
+            const a = this.gData.nodes[link.source];
+            const b = this.gData.nodes[link.target];
+            !a.neighbors && (a.neighbors = []);
+            !b.neighbors && (b.neighbors = []);
+            a.neighbors.push(b);
+            b.neighbors.push(a);
+
+            !a.links && (a.links = []);
+            !b.links && (b.links = []);
+            a.links.push(link);
+            b.links.push(link);
+        });         
+    }
+
+    /**
+     * Private method:
+     * Trigger update of highlighted objects in scene
+     * 
+     */
+    #updateHighlight() {
+        this.graph
+        .nodeColor(this.graph.nodeColor())
+        .linkWidth(this.graph.linkWidth())
+        .linkDirectionalParticles(this.graph.linkDirectionalParticles());
     }
 
     /**
@@ -139,7 +218,7 @@ export class EsteGraph {
         this.graph = ForceGraph3D()(this.elem)
             .width(W)
             .height(H)
-            .jsonUrl(this.filename)
+            .graphData(this.gData)
             .linkDirectionalArrowLength(10)
             .linkDirectionalArrowRelPos(0.5)
             .nodeColor(this.graphCallbacks.nodeColor(this.user_params))
@@ -151,10 +230,16 @@ export class EsteGraph {
             .linkColor(this.graphCallbacks.linkColor(this.user_params))
             .linkThreeObjectExtend(true)
             .linkThreeObject(this.graphCallbacks.linkThreeObject(this.user_params))
-            .linkPositionUpdate(this.graphCallbacks.linkPositionUpdate(this.user_params));
+            .linkPositionUpdate(this.graphCallbacks.linkPositionUpdate(this.user_params))
+            .linkDirectionalParticles(this.graphCallbacks.linkDirectionalParticles(this.user_params))
+            .linkDirectionalParticleWidth(4)
+            .onLinkHover(this.graphCallbacks.onLinkHover(this.user_params));
     
         this.graph.controls().dynamicDampingFactor = 0.8; // Make controls crisp
         this.elem.firstChild.style.position = "absolute";
+
+        // this.graph.d3AlphaDecay(0);
+        // this.graph.d3VelocityDecay(0.1);
     }
 
     /**
