@@ -75,7 +75,7 @@ void Proc::addImage(const Ctx::Image& img)
 {
 	// Add image
 	auto w = this->_images_lock.writer_aquire();
-	this->images.push_back(img);
+	this->images.insert(std::make_pair(img.getAddrRange().first, img));
 	this->_images_lock.writer_release(w);
 
 	// Serialize img
@@ -152,11 +152,15 @@ const Image* Proc::getImage(ADDRINT addr) const
 {
 	const Image* ret = NULL;
 	auto r = const_cast<Proc*>(this)->_images_lock.reader_aquire();
-	for (auto& i : this->images)
-		if (i.isWithinBinary(addr)) {
-			ret = &i;
-			break;
-		}
+	auto it = this->images.lower_bound(addr);
+	if (it->first == addr)
+		ret = &it->second;
+	else if (it != this->images.begin()) {
+		it--;
+		ret = &it->second;
+	}
+	if (ret && !ret->isWithinBinary(addr))
+		ret = NULL;
 	const_cast<Proc*>(this)->_images_lock.reader_release(r);
 	return ret;
 }
@@ -165,11 +169,15 @@ const Image* Proc::getImageExecutable(ADDRINT addr) const
 {
 	const Image* ret = NULL;
 	auto r = const_cast<Proc*>(this)->_images_lock.reader_aquire();
-	for (auto& i : this->images)
-		if (i.isWithinExecutableRange(addr)) {
-			ret = &i;
-			break;
-		}
+	auto it = this->images.lower_bound(addr);
+	if (it->first == addr)
+		ret = &it->second;
+	else if (it != this->images.begin()) {
+		it--;
+		ret = &it->second;
+	}
+	if (ret && !ret->isWithinExecutableRange(addr))
+		ret = NULL;
 	const_cast<Proc*>(this)->_images_lock.reader_release(r);
 	return ret;
 }
