@@ -1,4 +1,4 @@
-import * as CALLBACK from "./callback.mjs"
+import * as CALLBACK from "./callback.js"
 
 export class EsteGraph {
     

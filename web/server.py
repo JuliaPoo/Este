@@ -84,6 +84,9 @@ def serve(port:int) -> None:
     SERVER = HTTPServer(
         server_address = ('', port), 
         RequestHandlerClass = EsteServerHandler)
+    SERVER.RequestHandlerClass.extensions_map.update({
+      ".js": "application/javascript",
+    })
 
     try:
         logging.info(f'Starting Este server at port {port}...\n')
