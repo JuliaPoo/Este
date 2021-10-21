@@ -4,6 +4,8 @@ Este is an experimental tool in very early development that visualizes the dynam
 
 ## Build Instructions
 
+Open `x64_x86 Cross Tools Command Prompt for VS 2019`, available from a VS2019 install with the `Desktop Development with C++` package.
+
 ```batch
 :: Clone repository
 git clone --recursive https://github.com/JuliaPoo/Este
