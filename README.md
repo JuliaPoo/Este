@@ -4,15 +4,31 @@ Este is an experimental tool in very early development that visualizes the dynam
 
 ## Build Instructions
 
-```
+```batch
+:: Clone repository
 git clone --recursive https://github.com/JuliaPoo/Este
+
+:: Unzip pintool
 cd Este\Este\extLibs
 7z x pin-3.18-98332-gaebd7b1e6-msvc-windows.zip
+
+:: build Este in x86 and x64
+:: build files are written to .Este/build folder
+:: Alternatively, open `Este.sln` in Visual Studio 2019, 
+:: set the build configuration to either `Release x86` or `Release x64` and build.
+cd ..\
+msbuild /property:Configuration=Release /property:Platform="x86"
+msbuild /property:Configuration=Release /property:Platform="x64"
 ```
 
-Open `Este\Este.sln` in VS 2019, select build configuration to `Release` and build (in x64 or Win32).
+## Getting Started
 
-## Usage
+1. Move to this repository's root directory
+2. Edit [./este-config.toml](./este-config.toml) file and set the attribute `binary-whitelist` to the target binaries.
+    - E.g. `binary-whitelist = ["test/helloworld.exe"]`
+    - Read `./este-config.toml` for more details.
+3. Run `run <process name> <process arguments>`
+    - E.g. `run test/helloworld.exe`
+4. Wait for visualization to appear in a tab on a browser
 
-[TODO]
-For now just go into the `.\test` folder and run `run.bat 0 a-32.exe` or smth. The output is in `Este-out`. Read `run.bat` and `este-config.toml` for more information.
+For more details refer to the [Developer's Manual](./docs/Developers-Manual.md)
