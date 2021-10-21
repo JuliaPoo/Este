@@ -34,3 +34,6 @@ msbuild /property:Configuration=Release /property:Platform="x64"
 4. Wait for visualization to appear in a tab on a browser
 
 For more details refer to the [Developer's Manual](./docs/Developers-Manual.md)
+
+![helloworld](./docs/rsrc/helloworld-run.png)
+![notepad](./docs/rsrc/notepad-run.png)
