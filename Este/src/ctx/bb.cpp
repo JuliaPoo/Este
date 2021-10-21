@@ -104,7 +104,7 @@ const xed_decoded_inst_t Bb::disassemble(const ADDRINT addr, uint32_t& out_size)
 			goto end;
 		default:
 			RAISE_EXCEPTION(
-				"`xed_decode` Unhandled error code %s on address `%p`", 
+				"`xed_decode` Unhandled error code %s on address `%p`",
 				xed_error_enum_t2str(xed_error), (void*)addr);
 		}
 	}
@@ -133,7 +133,7 @@ const std::string Bb::inst_to_str(const ADDRINT addr, const xed_decoded_inst_t& 
 }
 
 ADDRINT Bb::get_rtn_addr_call_jmp_from_operand(
-	const CONTEXT* pinctx, const xed_decoded_inst_t& inst, 
+	const CONTEXT* pinctx, const xed_decoded_inst_t& inst,
 	const ADDRINT inst_addr, const uint32_t op_idx, const uint32_t memop_idx)
 {
 	auto xi = *xed_decoded_inst_inst(&inst);
@@ -205,7 +205,7 @@ ADDRINT Bb::get_rtn_addr_call_jmp_from_operand(
 }
 
 ADDRINT Bb::get_target_addr_from_call_jmp(
-	const CONTEXT* pinctx, const Proc* proc, 
+	const CONTEXT* pinctx, const Proc* proc,
 	const ADDRINT inst_addr, const xed_decoded_inst_t& inst)
 {
 	auto opcode = xed_decoded_inst_get_iclass(&inst);

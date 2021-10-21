@@ -44,9 +44,9 @@ VOID ThreadFini(THREADID pin_tid, const CONTEXT* ctxt, INT32 code, Ctx::Proc* pr
 
 VOID ImageLoad(IMG img, Ctx::Proc* procCtx)
 {
-	Ctx::Image i(img, procCtx);
+    Ctx::Image i(img, procCtx);
     procCtx->addImage(i);
-	LOGGING("Image loaded! %s", i.toStr().c_str());
+    LOGGING("Image loaded! %s", i.toStr().c_str());
 }
 
 VOID BblBef(const CONTEXT* pinctx, ADDRINT instptr, THREADID tid, Ctx::Proc* procCtx, uint32_t bbl_size)
@@ -113,12 +113,12 @@ VOID Trace(TRACE trace, Ctx::Proc* procCtx)
 
     // Check if trace is within whitelisted binaries
     if (!procCtx->isToBeLogged(taddr)) {
-        TRACE_InsertCall(trace, IPOINT_BEFORE, (AFUNPTR)TraceExitedWhitelisted, 
+        TRACE_InsertCall(trace, IPOINT_BEFORE, (AFUNPTR)TraceExitedWhitelisted,
             IARG_PTR, procCtx,
             IARG_END);
         return;
     }
-    TRACE_InsertCall(trace, IPOINT_BEFORE, (AFUNPTR)TraceEnteredWhitelistedCode, 
+    TRACE_InsertCall(trace, IPOINT_BEFORE, (AFUNPTR)TraceEnteredWhitelistedCode,
         IARG_PTR, procCtx,
         IARG_END);
 
@@ -158,8 +158,8 @@ void Instrument::Init_callbacks()
     auto procCtx = new Ctx::Proc();
     LOGGING("Proc created!");
 
-	// Image loading instrumentation
-	IMG_AddInstrumentFunction((IMAGECALLBACK)ImageLoad, procCtx);
+    // Image loading instrumentation
+    IMG_AddInstrumentFunction((IMAGECALLBACK)ImageLoad, procCtx);
 
     // Process finish instrumentation
     PIN_AddPrepareForFiniFunction((PREPARE_FOR_FINI_CALLBACK)PrepareForFiniFunctionFini, procCtx);

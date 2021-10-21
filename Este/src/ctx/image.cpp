@@ -38,12 +38,12 @@ std::string Image::toStr()
 		<< __get_filename_from_fullpath(this->path.c_str()) // Filename
 		<< (this->is_main ? " [MAIN]" : "") // is_main
 		<< (this->is_whitelisted ? " [WHITELISTED]" : "") // is_main
-		<< " [" << STREAM_POINTER_FORMAT << this->addr_range.first << "-" 
+		<< " [" << STREAM_POINTER_FORMAT << this->addr_range.first << "-"
 		<< STREAM_POINTER_FORMAT << this->addr_range.second << "]" // addr range
 		<< " [ Executable: ";
 	for (auto& r : this->addr_range_executable) // executable addr ranges
-		ret << STREAM_POINTER_FORMAT << r.first << "-" 
-			<< STREAM_POINTER_FORMAT << r.second << ",";
+		ret << STREAM_POINTER_FORMAT << r.first << "-"
+		<< STREAM_POINTER_FORMAT << r.second << ",";
 	ret << "]";
 	return ret.str();
 }
@@ -58,7 +58,7 @@ std::ostream& Ctx::operator<<(std::ostream& out, const Image& i)
 
 	uint8_t is_first = 0;
 	for (auto& r : i.addr_range_executable) {
-		out << (is_first++==0 ? "[" : ",[");
+		out << (is_first++ == 0 ? "[" : ",[");
 		out << r.first << "," << r.second << "]";
 	}
 
@@ -75,29 +75,29 @@ const int32_t Image::getIdx() const
 	return this->idx;
 }
 
-const std::string& Image::getPath() const 
-{ 
-	return this->path; 
-}
-
-const std::pair<ADDRINT, ADDRINT>& Image::getAddrRange() const 
-{ 
-	return this->addr_range; 
-}
-
-const std::vector< std::pair<ADDRINT, ADDRINT>>& Image::getAddrRangeExecutable() const 
-{ 
-	return this->addr_range_executable; 
-}
-
-bool Image::isMain() const 
-{ 
-	return this->is_main; 
-}
-
-bool Image::isWhitelisted() const 
+const std::string& Image::getPath() const
 {
-	return this->is_whitelisted; 
+	return this->path;
+}
+
+const std::pair<ADDRINT, ADDRINT>& Image::getAddrRange() const
+{
+	return this->addr_range;
+}
+
+const std::vector< std::pair<ADDRINT, ADDRINT>>& Image::getAddrRangeExecutable() const
+{
+	return this->addr_range_executable;
+}
+
+bool Image::isMain() const
+{
+	return this->is_main;
+}
+
+bool Image::isWhitelisted() const
+{
+	return this->is_whitelisted;
 }
 
 bool Image::isWithinBinary(ADDRINT addr) const
@@ -106,7 +106,7 @@ bool Image::isWithinBinary(ADDRINT addr) const
 	return addr < r.second&& addr > r.first;
 }
 
-bool Image::isWithinExecutableRange(ADDRINT addr) const 
+bool Image::isWithinExecutableRange(ADDRINT addr) const
 {
 	for (auto& r : this->addr_range_executable)
 		if (addr < r.second && addr > r.first)

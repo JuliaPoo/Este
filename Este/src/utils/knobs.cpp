@@ -22,7 +22,7 @@ KNOB<std::string> knobs_config_file(KNOB_MODE_WRITEONCE, "pintool",
 #define BINARY_WHITELIST_DOCUMENTATION                                       \
 "         binary-whitelist @type List[str]:\n"                               \
 "             Este will analyse only binaries in this list\n"             
- 
+
 #define LOG_DYNAMICALLY_GENERATED_DOCUMENTATION                              \
 "        log-dynamically-generated @type bool:\n"                            \
 "             Log execution of code outside of loaded binaries (e.g. in the heap/stack)\n" \

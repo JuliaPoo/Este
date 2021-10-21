@@ -54,7 +54,7 @@ Proc::~Proc()
 
 	Serial::getDbSerial()
 		<< "]"  // Close list for binaries
-		   "}"; // Close
+		<< "}"; // Close
 	Serial::getDbSerial().flush();
 	Serial::getBbSerial().flush();
 	Serial::getRtnSerial().flush();

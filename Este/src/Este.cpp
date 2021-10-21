@@ -7,22 +7,24 @@
 #include "Este\errors.hpp"
 
 #define ESTE_BANNER \
-"\n" \
-"     ,ggggggg,       ,gg,   ,ggggggggggggggg   ,ggggggg,   " "\n" \
-"   ,dP\"\"\"\"\"\"Y8b     i8\"\"8i dP\"\"\"\"\"\"88\"\"\"\"\"\"\" ,dP\"\"\"\"\"\"Y8b  " "\n" \
-"   d8'    a  Y8     `8,,8' Yb,_    88        d8'    a  Y8  " "\n" \
-"   88     \"Y8P'      `88'   `\"\"    88        88     \"Y8P'  " "\n" \
-"   `8baaaa           dP\"8,         88        `8baaaa       " "\n" \
-"  ,d8P\"\"\"\"          dP' `8a        88       ,d8P\"\"\"\"       " "\n" \
-"  d8\"              dP'   `Yb       88       d8\"            " "\n" \
-"  Y8,          _ ,dP'     I8 gg,   88       Y8,            " "\n" \
-"  `Yba,,_____, \"888,,____,dP  \"Yb,,8P       `Yba,,_____,   " "\n" \
-"    `\"Y8888888 a8P\"Y88888P\"     \"Y8P'         `\"Y8888888   " "\n" \
-"\n"
+R"BANNER(
+
+     ,ggggggg,       ,gg,   ,ggggggggggggggg   ,ggggggg,   
+   ,dP""""""Y8b     i8""8i dP""""""88""""""" ,dP""""""Y8b  
+   d8'    a  Y8     `8,,8' Yb,_    88        d8'    a  Y8  
+   88     "Y8P'      `88'   `""    88        88     "Y8P'  
+   `8baaaa           dP"8,         88        `8baaaa       
+  ,d8P""""          dP' `8a        88       ,d8P""""       
+  d8"              dP'   `Yb       88       d8"            
+  Y8,          _ ,dP'     I8 gg,   88       Y8,            
+  `Yba,,_____, "888,,____,dP  "Yb,,8P       `Yba,,_____,   
+    `"Y8888888 a8P"Y88888P"     "Y8P'         `"Y8888888   
+
+)BANNER"
 
 int Usage(char* argv[]) {
-    std::cout << 
-        "\nUsage:\n" << 
+    std::cout <<
+        "\nUsage:\n" <<
         "    pin.exe <pin knobs> -config-file <config filepath> -- <target program and arguments>\n"
         "        @param config-file: Este config file. See `este-config.toml` for more details\n"
         << std::endl;
