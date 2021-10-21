@@ -1,7 +1,7 @@
 import * as CALLBACK from "./callback.js"
 
 export class EsteGraph {
-    
+
     /**
      * Constructs the graph
      * 
@@ -11,8 +11,7 @@ export class EsteGraph {
      * @param {int} os_tid OS Thread ID to be plotted
      * @param {int} pin_tid PIN Thread ID to be plotted
      */
-    constructor (elem, more_details, pid, os_tid, pin_tid)
-    {
+    constructor(elem, more_details, pid, os_tid, pin_tid) {
 
         this.elem = elem;
         this.more_details = more_details;
@@ -50,9 +49,9 @@ export class EsteGraph {
         this._clicked_node = undefined;
         this.graphCallbacks = {
             nodeColor: params => node => {
-                return this._clicked_node == node ? 'rgb(128,255,220)' : 
+                return this._clicked_node == node ? 'rgb(128,255,220)' :
                     (this._highlight_nodes.has(node) ? node === this._hovered_node ? 'rgb(255,0,0,1)' : "rgb(255,200,128)" : 'white');
-                    // (this._hovered_node == node ? "rgb(255,200,128)" : "white");
+                // (this._hovered_node == node ? "rgb(255,200,128)" : "white");
             },
             onNodeHover: params => node => {
                 // no state change
@@ -62,9 +61,9 @@ export class EsteGraph {
                 this._highlight_links.clear();
 
                 if (node) {
-                  this._highlight_nodes.add(node);
-                  node.neighbors.forEach(neighbor => this._highlight_nodes.add(neighbor));
-                  node.links.forEach(link => this._highlight_links.add(link));
+                    this._highlight_nodes.add(node);
+                    node.neighbors.forEach(neighbor => this._highlight_nodes.add(neighbor));
+                    node.links.forEach(link => this._highlight_links.add(link));
                 }
                 this._hovered_node = node || null;
                 this.#updateHighlight();
@@ -72,20 +71,20 @@ export class EsteGraph {
             onNodeClick: params => node => {
                 // No change
                 if (!node || this._clicked_node == node) return;
-                
+
                 // update
                 if (this._clicked_node != undefined) {
-                    this._clicked_node.__threeObj.scale.set(1,1,1);
+                    this._clicked_node.__threeObj.scale.set(1, 1, 1);
                 }
                 this._clicked_node = node;
                 this.graph.nodeColor(this.graph.nodeColor());
                 this.graph.nodeRelSize(this.graph.nodeRelSize());
-                node.__threeObj.scale.set(2,2,2);
+                node.__threeObj.scale.set(2, 2, 2);
 
                 this.#displayMoreDetails(node);
             },
             linkWidth: params => link => {
-                return this._highlight_links.has(link) ? 4 : 1/params.frequencySensitivity * Math.log(link.count) + 1
+                return this._highlight_links.has(link) ? 4 : 1 / params.frequencySensitivity * Math.log(link.count) + 1
             },
             linkOpacity: params => params.linkOpacity,
             linkCurvature: params => link => {
@@ -115,9 +114,9 @@ export class EsteGraph {
                 this._highlight_links.clear();
 
                 if (link) {
-                  this._highlight_links.add(link);
-                  this._highlight_nodes.add(link.source);
-                  this._highlight_nodes.add(link.target);
+                    this._highlight_links.add(link);
+                    this._highlight_nodes.add(link.source);
+                    this._highlight_nodes.add(link.target);
                 }
 
                 this.#updateHighlight();
@@ -126,7 +125,7 @@ export class EsteGraph {
                 return this._highlight_links.has(link) ? 4 : 0;
             },
             linkDirectionalParticleSpeed: params => link => {
-                return 1/params.frequencySensitivity * Math.log(link.count) + 1;
+                return 1 / params.frequencySensitivity * Math.log(link.count) + 1;
             },
         }
 
@@ -145,12 +144,11 @@ export class EsteGraph {
      * Parses json file contents into a obj
      * 
      */
-    #parseFile(filename)
-    {
+    #parseFile(filename) {
         var Httpreq = new XMLHttpRequest(); // a new request
-        Httpreq.open("GET",filename,false);
+        Httpreq.open("GET", filename, false);
         Httpreq.send(null);
-        return JSON.parse(Httpreq.responseText);          
+        return JSON.parse(Httpreq.responseText);
     }
 
     /**
@@ -158,8 +156,7 @@ export class EsteGraph {
      * Adds neighbouring nodes and links to each object in gData
      * 
      */
-    #crossLinkNode()
-    {
+    #crossLinkNode() {
         this.gData.links.forEach(link => {
             const a = this.gData.nodes[link.source];
             const b = this.gData.nodes[link.target];
@@ -172,7 +169,7 @@ export class EsteGraph {
             !b.links && (b.links = []);
             a.links.push(link);
             b.links.push(link);
-        });         
+        });
     }
 
     /**
@@ -182,9 +179,9 @@ export class EsteGraph {
      */
     #updateHighlight() {
         this.graph
-        .nodeColor(this.graph.nodeColor())
-        .linkWidth(this.graph.linkWidth())
-        .linkDirectionalParticles(this.graph.linkDirectionalParticles());
+            .nodeColor(this.graph.nodeColor())
+            .linkWidth(this.graph.linkWidth())
+            .linkDirectionalParticles(this.graph.linkDirectionalParticles());
     }
 
     /**
@@ -192,8 +189,7 @@ export class EsteGraph {
      * Initializes the GUI that enables
      * user to control `params`
      */
-    #createGUI()
-    {
+    #createGUI() {
         this.gui = new dat.GUI();
 
         this.gui.domElement.id = 'graph-config';
@@ -211,15 +207,14 @@ export class EsteGraph {
         this.gui.add(this.user_params, "fontSize", 1, 100, 1).onChange(
             val => this.graph.linkThreeObject(this.graphCallbacks.linkThreeObject(this.user_params)));
 
-        this.gui.close(); 
+        this.gui.close();
     }
 
     /**
      * Private method:
      * Initializes the graph
      */
-    #createGraph()
-    {
+    #createGraph() {
         var W = this.elem.clientWidth;
         var H = this.elem.clientHeight;
         this.graph = ForceGraph3D()(this.elem)
@@ -245,20 +240,16 @@ export class EsteGraph {
             .d3AlphaDecay(0)
             .d3VelocityDecay(0.1)
             .cooldownTime(30000);
-    
+
         this.graph.controls().dynamicDampingFactor = 0.8; // Make controls crisp
         this.elem.firstChild.style.position = "absolute";
-
-        // this.graph.d3AlphaDecay(0);
-        // this.graph.d3VelocityDecay(0.1);
     }
 
     /**
      * Private method:
      * Register window handles for EsteGraph
      */
-    #registerHandlers()
-    {
+    #registerHandlers() {
         window.addEventListener('resize', () => {
 
             var W = this.elem.clientWidth;
@@ -276,10 +267,9 @@ export class EsteGraph {
      * Display more details about the node
      * @param {ForceGraph3D node} node node to get more details of 
      */
-    #displayMoreDetails(node)
-    {
+    #displayMoreDetails(node) {
         CALLBACK.query_server_node_details(node, this.pid, this.pin_tid).then(node => {
-            
+
             let dets = "Node #" + node.id.toString() + "\n\n";
             dets += "Image: " + node.image_path.toString() + "\n\n";
             dets += "Executed Count: " + node.count.toString() + "\n\n";
