@@ -241,7 +241,10 @@ export class EsteGraph {
             .linkPositionUpdate(this.graphCallbacks.linkPositionUpdate(this.user_params))
             .linkDirectionalParticles(this.graphCallbacks.linkDirectionalParticles(this.user_params))
             .linkDirectionalParticleWidth(4)
-            .onLinkHover(this.graphCallbacks.onLinkHover(this.user_params));
+            .onLinkHover(this.graphCallbacks.onLinkHover(this.user_params))
+            .d3AlphaDecay(0)
+            .d3VelocityDecay(0.1)
+            .cooldownTime(30000);
     
         this.graph.controls().dynamicDampingFactor = 0.8; // Make controls crisp
         this.elem.firstChild.style.position = "absolute";
