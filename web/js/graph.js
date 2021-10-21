@@ -33,6 +33,7 @@ export class EsteGraph {
         * that tune the look of the visualization.
         */
         this.user_params = {
+            enableNodeDrag: false,
             linkOpacity: 0.6,
             frequencySensitivity: 0.7,
             fontSize: 10
@@ -197,6 +198,12 @@ export class EsteGraph {
 
         this.gui.domElement.id = 'graph-config';
 
+        this.gui.add(this.user_params, "enableNodeDrag")
+            .name("Enable Node Dragging")
+            .onChange(
+                val => this.graph.enableNodeDrag(this.user_params.enableNodeDrag)
+            );
+
         this.gui.add(this.user_params, "linkOpacity", 0.0, 1.0).onChange(
             val => this.graph.linkOpacity(this.graphCallbacks.linkOpacity(this.user_params)));
         this.gui.add(this.user_params, "frequencySensitivity", 0.0, 1.0).onChange(
@@ -219,6 +226,7 @@ export class EsteGraph {
             .width(W)
             .height(H)
             .graphData(this.gData)
+            .enableNodeDrag(this.user_params.enableNodeDrag)
             .linkDirectionalArrowLength(10)
             .linkDirectionalArrowRelPos(0.5)
             .nodeColor(this.graphCallbacks.nodeColor(this.user_params))
