@@ -5,13 +5,14 @@ title = "Este Dynamic Analysis Config"
 
 # output-dir @type str:
 #    Directory where Este will dump logs and trace data to.
+#    Do not modify this attribute.
 output-dir = "gen/Este-out"
 
 [ANALYSIS-SCOPE]
 
 # binary-whitelist @type List[str]:
 #    Este will analyse only binaries in this list
-binary-whitelist = ["helloworld.exe", "ipconfig.exe"]
+binary-whitelist = ["helloworld.exe"]
 
 # log-dynamically-generated @type bool:
 #    Log execution of code outside of loaded binaries (e.g. in the heap/stack)
