@@ -1,4 +1,4 @@
-from format_helper import ParsedProcess
+from postprocessing.format_helper import ParsedProcess
 import os
 import json
 import pathlib
@@ -16,7 +16,7 @@ def getPids() -> list:
     all_pids = [int(f[3:]) for f in all_prefix]
     return all_pids
 
-def main():
+def postProcessing():
 
     all_pids = getPids()
     

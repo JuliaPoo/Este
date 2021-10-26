@@ -93,3 +93,5 @@ Este Pintool outputs 5 files.
 ### Debugging Este Pintool
 
 Add the PIN commandline switch `-pause_tool <seconds>` to pause the tool upon PIN initialization, and attach a debugger (e.g. WinDbg), and resume execution.
+
+## Component 2: Post Processing
