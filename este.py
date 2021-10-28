@@ -7,7 +7,7 @@ import subprocess
 parser = argparse.ArgumentParser(description='Visualizes the dynamic runtime of a binary')
 parser.add_argument("-t", "--pause", type=str, default='0',
                     help="time to pause tool")
-parser.add_argument("-p", "--port", type=str, default=7777,
+parser.add_argument("-p", "--port", type=int, default=7777,
                     help="webserver port")
 parser.add_argument('binary', metavar='b', type=str,
                     help='binary to be analyzed')
