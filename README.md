@@ -29,8 +29,8 @@ msbuild /property:Configuration=Release /property:Platform="x64"
 2. Edit [./este-config.toml](./este-config.toml) file and set the attribute `binary-whitelist` to the target binaries.
     - E.g. `binary-whitelist = ["test/helloworld.exe"]`
     - Read `./este-config.toml` for more details.
-3. Run `run <process name> <process arguments>`
-    - E.g. `run test/helloworld.exe`
+3. Run `python este.py <process name> <process arguments>`
+    - E.g. `python este.py test/helloworld.exe`
 4. Wait for visualization to appear in a tab on a browser
 
 For more details refer to the [Developer's Manual](./docs/Developers-Manual.md)

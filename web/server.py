@@ -1,4 +1,4 @@
-from datahandler import EsteDataHandler
+from web.datahandler import EsteDataHandler
 
 from http.server import HTTPServer, CGIHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
@@ -106,16 +106,8 @@ def launch(port:int) -> None:
     webbrowser.open(f'http://localhost:{port}') 
     return
 
-def main() -> int:
+def server(port) -> int:
 
-    from sys import argv
-    logging.basicConfig(level=logging.INFO)
-
-    if len(argv) != 2 or not argv[1].isdigit():
-        print(USAGE%argv[0])
-        return 1
-
-    port = int(argv[1])
     launch(port)
     serve(port)
     
