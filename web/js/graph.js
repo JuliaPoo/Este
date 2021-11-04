@@ -158,8 +158,13 @@ export class EsteGraph {
      */
     #crossLinkNode() {
         this.gData.links.forEach(link => {
+            
             const a = this.gData.nodes[link.source];
             const b = this.gData.nodes[link.target];
+            
+            if (a == undefined || b == undefined)
+                return;
+
             !a.neighbors && (a.neighbors = []);
             !b.neighbors && (b.neighbors = []);
             a.neighbors.push(b);
