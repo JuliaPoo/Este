@@ -25,6 +25,7 @@ msbuild /property:Configuration=Release /property:Platform="x64"
 
 ## Getting Started
 
+[Note: A refactor is in the works to put everything in a nice python module]
 1. Move to this repository's root directory
 2. Edit [./este-config.toml](./este-config.toml) file and set the attribute `binary-whitelist` to the target binaries.
     - E.g. `binary-whitelist = ["test/helloworld.exe"]`
